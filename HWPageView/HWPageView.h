@@ -26,7 +26,7 @@
 - (CGFloat)heightForTab;
 - (UIColor *)colorForTabBg;
 
-- (void)pageview:(HWPageView *)pageView didChangeTabToIndex:(NSInteger)index;
+- (void)pageview:(HWPageView *)pageView didChangeTabFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
 
 @end
 
@@ -45,7 +45,8 @@
 - (instancetype)initWithFrame:(CGRect)frame
       withTabTitleNormalColor:(UIColor *)normalColor
    withTabTitleHighlightColor:(UIColor *)highlightColor
-               isTabCanScroll:(BOOL)isTabCanScroll;
+               isTabCanScroll:(BOOL)isTabCanScroll
+                     delegate:(id<HWPageViewDataSource, HWPageViewDelegate>)delegate;
 
 
 @end

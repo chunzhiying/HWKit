@@ -110,9 +110,13 @@
       withTabTitleNormalColor:(UIColor *)normalColor
    withTabTitleHighlightColor:(UIColor *)highlightColor
                isTabCanScroll:(BOOL)isTabCanScroll
+                     delegate:(id<HWPageViewDataSource,HWPageViewDelegate>)delegate
 {
     self = [super initWithFrame:frame];
     if (self) {
+        
+        _dataSource = delegate;
+        _delegate = delegate;
         
         _tabScrollHeight = defaultTabScrollHeight;
         if (_delegate && [_delegate respondsToSelector:@selector(heightForTab)]) {
@@ -125,26 +129,16 @@
         _tabTitleNormalColor = normalColor;
         _tabTitleHighlightColor = highlightColor;
         _isTabScrollCanRoll = isTabCanScroll;
+        
+        [self initTabScroll];
+        [self initPageScroll];
+        [self initSeparateline];
+        [self initSelectedLine];
+        
+        self.selectedIndex = 0;
 
     }
     return self;
-}
-
-- (void)drawRect:(CGRect)rect {
-    [super drawRect:rect];
-    
-    [self removeAllView];
-    [self initTabScroll];
-    [self initPageScroll];
-    [self initSeparateline];
-    [self initSelectedLine];
-}
-
-- (void)removeAllView {
-    [_selectedLine removeFromSuperview];
-    [_tabScroll removeFromSuperview];
-    [_pageScroll removeFromSuperview];
-    [_selectedLine removeFromSuperview];
 }
 
 #pragma mark - Custom Method
@@ -230,7 +224,6 @@
 
 #pragma mark - Setter 
 - (void)setSelectedIndex:(NSInteger)selectedIndex {
-    _selectedIndex = selectedIndex;
     
     [self resetTabScroll];
     TabItem *selectedItem = [_tabAry objectAtIndex:selectedIndex];
@@ -248,9 +241,11 @@
     
     
     _selectedPage = [_pageAry objectAtIndex:selectedIndex];
-    if (_delegate && [_delegate respondsToSelector:@selector(pageview:didChangeTabToIndex:)]) {
-        [_delegate pageview:self didChangeTabToIndex:selectedIndex];
+    if (_delegate && [_delegate respondsToSelector:@selector(pageview:didChangeTabFromIndex:toIndex:)]) {
+        [_delegate pageview:self didChangeTabFromIndex:_selectedIndex toIndex:selectedIndex];
     }
+    
+    _selectedIndex = selectedIndex;
 }
 
 - (void)setSeparateLineColor:(UIColor *)separateLineColor {
