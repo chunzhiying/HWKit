@@ -10,25 +10,9 @@
 
 #define defaultFontColor [UIColor blackColor]
 
-@interface HWTextView : UITextView
-
-@end
-
-@implementation HWTextView
-
-- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
-    return NO;
-}
-
-- (BOOL)canBecomeFirstResponder {
-    return NO;
-}
-
-@end
-
 @interface HWRichText() <UITextViewDelegate> {
     
-    HWTextView *_contentTxtView;
+    UITextView *_contentTxtView;
     CGSize _txtViewContenSize;
     
     NSMutableAttributedString *_contentAttributedStr;
@@ -71,7 +55,7 @@
     _strSelectorDic = [NSMutableDictionary new];
     _imgSelectorDic = [NSMutableDictionary new];
     
-    _contentTxtView = [[HWTextView alloc] initWithFrame:self.bounds];
+    _contentTxtView = [[UITextView alloc] initWithFrame:self.bounds];
     _contentTxtView.editable = NO;
     _contentTxtView.delegate = self;
     
@@ -196,10 +180,6 @@
 }
 
 #pragma mark - TextView Delegate
-- (void)textViewDidChangeSelection:(UITextView *)textView {
-    textView.selectedRange = NSMakeRange(0, 0);
-}
-
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
     
     TargetSelector selector = [_strSelectorDic objectForKey:@(characterRange.location)];

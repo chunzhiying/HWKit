@@ -31,13 +31,6 @@
 @end
 
 
-typedef NS_ENUM(NSInteger, HWPageSelectedType){
-    HWPageSelectedType_Dot = 0,
-    HWPageSelectedType_Line,
-    HWPageSelectedType_None
-};
-
-
 @interface HWPageView : UIView
 
 @property (nonatomic, weak) id<HWPageViewDataSource> dataSource;
@@ -54,7 +47,6 @@ typedef NS_ENUM(NSInteger, HWPageSelectedType){
       withTabTitleNormalColor:(UIColor *)normalColor
    withTabTitleHighlightColor:(UIColor *)highlightColor
                isTabCanScroll:(BOOL)isTabCanScroll
-                 selectedType:(HWPageSelectedType)type
                      delegate:(id<HWPageViewDataSource, HWPageViewDelegate>)delegate;
 
 - (void)reloadData;

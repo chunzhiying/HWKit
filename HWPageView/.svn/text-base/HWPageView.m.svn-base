@@ -10,12 +10,10 @@
 
 #define tabItemTagKey @"tabItemTagKey"
 
-#define defaultItemDotDiameter 3
-
-#define defaultTabScrollHeight 36
+#define defaultTabScrollHeight 50
 #define defaultTabIemWidth 80
 
-#define defaultSeparateLineColor [UIColor colorWithRed:217.f/255.f green:217.f/255.f blue:217.f/255.f alpha:1]
+#define defaultSeparateLineColor [UIColor lightGrayColor]
 #define defaultTabScrollBgColor [UIColor whiteColor]
 
 #define defaultSelectLineMask 10
@@ -47,7 +45,6 @@
     UIColor *_normalColor;
     UIColor *_highlightColor;
     UILabel *_label;
-    CAShapeLayer *_dot;
 }
 
 @property (nonatomic) BOOL isSelected;
@@ -60,7 +57,6 @@
                     withTitle:(NSString *)title
               withNormalColor:(UIColor *)normalColor
            withHighlightColor:(UIColor *)highlightColor
-                      showDot:(BOOL)showDot
 {
     self = [super initWithFrame:frame];
     if (self) {
@@ -69,41 +65,23 @@
         
         _label = [[UILabel alloc] initWithFrame:self.bounds];
         _label.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _label.font = [UIFont systemFontOfSize:15];
+        _label.font = [UIFont systemFontOfSize:16];
         _label.textAlignment = NSTextAlignmentCenter;
         _label.text = title;
         _label.textColor = normalColor;
-        
-        _dot = [CAShapeLayer layer];
-        _dot.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, defaultItemDotDiameter, defaultItemDotDiameter)].CGPath;
-        _dot.fillColor = highlightColor.CGColor;
-        _dot.strokeColor = highlightColor.CGColor;
-        if (showDot) {
-            [self.layer addSublayer:_dot];
-        }
-        
         [self addSubview:_label];
     }
     return self;
 }
 
-- (void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
-    _dot.position = CGPointMake((self.bounds.size.width - defaultItemDotDiameter) / 2,
-                                self.bounds.size.height - defaultItemDotDiameter - 3);
-}
-
 - (void)setIsSelected:(BOOL)isSelected {
     _isSelected = isSelected;
     _label.textColor = isSelected ? _highlightColor : _normalColor;
-    _dot.hidden = !isSelected;
 }
 
 @end
 
 @interface HWPageView () <UIScrollViewDelegate> {
-    
-    HWPageSelectedType _selectedType;
     
     UIView *_separateline;
     UIScrollView *_tabScroll;
@@ -134,8 +112,7 @@
       withTabTitleNormalColor:(UIColor *)normalColor
    withTabTitleHighlightColor:(UIColor *)highlightColor
                isTabCanScroll:(BOOL)isTabCanScroll
-                 selectedType:(HWPageSelectedType)type
-                     delegate:(id<HWPageViewDataSource, HWPageViewDelegate>)delegate
+                     delegate:(id<HWPageViewDataSource,HWPageViewDelegate>)delegate
 {
     self = [super initWithFrame:frame];
     if (self) {
@@ -155,7 +132,6 @@
         _tabTitleHighlightColor = highlightColor;
         _isTabScrollCanRoll = isTabCanScroll;
         
-        _selectedType = type;
         _pageOffset = 0.0f;
         
         [self reloadData];
@@ -200,12 +176,10 @@
 }
 
 - (void)initSelectedLine {
-    
     _selectedLine = [[UIView alloc] initWithFrame:CGRectZero];
     _selectedLine.backgroundColor = _tabTitleHighlightColor;
-    _selectedLine.hidden = _selectedType != HWPageSelectedType_Line;
-    
     [self addSubview:_selectedLine];
+    
     [self resetSeletedLineFrame];
 }
 
@@ -226,8 +200,7 @@
         TabItem *tabItem = [[TabItem alloc] initWithFrame:CGRectZero
                                                 withTitle:[_dataSource pageView:self titleAtIndex:index]
                                           withNormalColor:_tabTitleNormalColor
-                                       withHighlightColor:_tabTitleHighlightColor
-                                                  showDot:_selectedType == HWPageSelectedType_Dot];
+                                       withHighlightColor:_tabTitleHighlightColor];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickTabItem:)];
         [tabItem addGestureRecognizer:tap];
         [tabItem.layer setValue:@(index) forKey:tabItemTagKey];

@@ -8,15 +8,16 @@
 
 #import "LoadingBox.h"
 
-static int LoadingBoxWide = 150;
-static int LoadingBoxHeight = 100;
+#define LoadingBoxWide 150
+#define LoadingBoxHeight 100
+
 
 @interface LoadingBox(){
     
     __weak IBOutlet UIActivityIndicatorView *_activityIndicator;
     __weak IBOutlet UILabel *_loadingTxt;
     UIView *_containerView;
-    
+    NSTimer *_timer;
 }
 
 @end
@@ -46,15 +47,15 @@ static int LoadingBoxHeight = 100;
 
 - (void)showInView:(UIView *)parentView withText:(NSString *)str withWaitingTime:(NSTimeInterval)time {
     
-    if (!_isHide) {
-        return;
-    }
+    [self removeSelf];
     
     self.frame = CGRectMake(0, 0, LoadingBoxWide, LoadingBoxHeight);
     _loadingTxt.text = str;
     [_activityIndicator startAnimating];
     
-    _containerView = [[UIView alloc] initWithFrame:CGRectMake((parentView.frame.size.width - LoadingBoxWide)/2, (parentView.frame.size.height - LoadingBoxHeight)/2 - 50, LoadingBoxWide, LoadingBoxHeight)];
+    _containerView = [[UIView alloc] initWithFrame:CGRectMake((parentView.frame.size.width - LoadingBoxWide) / 2,
+                                                              (parentView.frame.size.height - LoadingBoxHeight) / 2 - 50,
+                                                              LoadingBoxWide, LoadingBoxHeight)];
     
     _containerView.backgroundColor = [UIColor blackColor];
     _containerView.alpha = 0.7;
@@ -64,37 +65,49 @@ static int LoadingBoxHeight = 100;
     [_containerView addSubview:self];
     [parentView addSubview:_containerView];
     
-    self.isHide = NO;
+    _isHide = NO;
     
-    if (time <= 0) {
-        return;
+    if (time > 0) {
+        [self addTimerWaiting:time];
     }
-    
-    NSTimer *timer = [NSTimer timerWithTimeInterval:time target:self selector:@selector(timeOut) userInfo:nil repeats:NO];
-    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
 }
 
-- (void)hide{
+- (void)hide {
     
-    if (_containerView == nil) {
+    [self invalidateTimer];
+    if (_containerView == nil || _isHide) {
         return;
     }
-    
-    __weak __typeof(self)weakSelf = self;
+    _isHide = YES;
     
     [UIView animateWithDuration:0.3 animations:^{
         _containerView.alpha = 0;
         
     } completion:^(BOOL finish){
-        if (weakSelf) {
-            __strong __typeof(weakSelf)strongSelf = weakSelf;
-            [strongSelf->_containerView removeFromSuperview];
-            strongSelf ->_containerView = nil;
-            strongSelf.isHide = YES;
-        }
+        [self removeSelf];
+        
     }];
 }
 
+- (void)removeSelf {
+    [_containerView removeFromSuperview];
+    _containerView = nil;
+    [self invalidateTimer];
+}
+
+#pragma mark - Timer
+- (void)addTimerWaiting:(NSTimeInterval)time {
+    [self invalidateTimer];
+    _timer = [NSTimer timerWithTimeInterval:time target:self selector:@selector(timeOut) userInfo:nil repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
+}
+
+- (void)invalidateTimer {
+    if (_timer) {
+        [_timer invalidate];
+        _timer = nil;
+    }
+}
 
 - (void)timeOut {
     
@@ -103,7 +116,6 @@ static int LoadingBoxHeight = 100;
     if (_delegate && [_delegate respondsToSelector:@selector(loadingBoxTimeOut)]) {
         [_delegate loadingBoxTimeOut];
     }
-    
 }
 
 @end
