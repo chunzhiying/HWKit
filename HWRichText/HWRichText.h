@@ -8,16 +8,23 @@
 
 #import <UIKit/UIKit.h>
 
-
 typedef void(^TargetSelector)();
 
 @interface HWRichText : UIView
 
 @property (nonatomic, strong, readonly) NSAttributedString *richContentText;
-@property (nonatomic, strong) UIFont *defaultFont;
-@property (nonatomic) BOOL showInCenter;
 
-- (void)setSelectorTextColor:(UIColor *)color;
+@property (nonatomic, strong) UIColor *textColor; //default: blackColor
+@property (nonatomic, strong) UIFont *font;  //default: 15
+@property (nonatomic) CGFloat lineSpace; //default: 2
+
+@property (nonatomic) BOOL showInCenter; //auto offset to center in frame
+@property (nonatomic) BOOL scrollEnabled;
+@property (nonatomic) BOOL selectedHighlightEnabled; //highlight when selected, default: YES
+
+@property (nonatomic) NSUInteger maxShowLine; //will reset frame.size.height, (NSUIntegerMax to get All content height.)
+
+- (void)setSelectorTextColor:(UIColor *)color; //clickable textColor, default: blue
 
 - (HWRichText *)insertString:(NSString *)string;
 - (HWRichText *)insertString:(NSString *)string withFont:(UIFont *)font withTextColor:(UIColor *)color;
@@ -27,5 +34,23 @@ typedef void(^TargetSelector)();
 
 - (HWRichText *)insertImage:(UIImage *)image withBounds:(CGRect)rect;
 - (HWRichText *)insertImage:(UIImage *)image withBounds:(CGRect)rect withSelector:(TargetSelector)selector;
+
+- (void)clearAllText;
+
+@end
+
+
+@protocol HWParserSetting <NSObject>
+
+@property (nonatomic, strong) NSRegularExpression *regex;
+
+- (void)onMactchedWithText:(NSString *)text inRichText:(HWRichText *)richText;
+
+@end
+
+@interface HWRichText (Parser)
+
+- (HWRichText *)appendText:(NSString *)text withFont:(UIFont *)font withTextColor:(UIColor *)color
+                withParser:(NSArray<id<HWParserSetting>> *)parsers;
 
 @end

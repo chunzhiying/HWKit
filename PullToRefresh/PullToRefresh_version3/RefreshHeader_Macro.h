@@ -9,13 +9,14 @@
 #ifndef PullToRefreshHeaderView_h
 #define PullToRefreshHeaderView_h
 
+#define isIOS8 ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0)
 
 #define TimerWaitingDuration 10
 #define RefreshHeaderHeight 50
 #define LoadMoreCellHeight 50
 #define DefaultCellHeight LoadMoreCellHeight
 #define AutoRefreshHeaderHeight (RefreshHeaderHeight + 1)
-#define CantSeeHeaderFooterHeight 0.01
+#define CantSeeHeaderFooterHeight isIOS8 ? 0.01 : 0
 
 
 #define Delay(time, block) \

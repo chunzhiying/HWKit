@@ -8,10 +8,12 @@
 
 #import "LoadMoreCell.h"
 
-@interface LoadMoreCell(){
+@interface LoadMoreCell() {
+    
+    LoadMoreState _state;
+    
     __weak IBOutlet UILabel *_tipsLabel;
     __weak IBOutlet UIActivityIndicatorView *_tipsActivity;
-
 }
 @end
 
@@ -19,27 +21,52 @@
 
 - (void)awakeFromNib {
     [_tipsActivity startAnimating];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickSelf)];
+    [self addGestureRecognizer:tap];
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-}
-
-
-- (void)setLoadMoreType:(LoadMoreState)state{
+- (void)setLoadMoreType:(LoadMoreState)state {
+    
+    _state = state;
+    
+    _tipsLabel.hidden = NO;
+    _tipsActivity.hidden = NO;
+    
     switch (state) {
         case NetworkNotReachable:
             _tipsLabel.hidden = YES;
             _tipsActivity.hidden = YES;
             break;
-        case NoMoreData:
-            _tipsLabel.text = @"已经到底啦!";
+            
+        case NoMore:
             _tipsActivity.hidden = YES;
+            _tipsLabel.text = @"已经到底啦!";
             break;
-        case LoadMoreData:
+            
+        case CanLoadMore:
             _tipsLabel.text = @"加载更多..";
-            _tipsActivity.hidden = NO;
+            break;
+            
+        case ClickToReload:
+            _tipsActivity.hidden = YES;
+            _tipsLabel.text = @"加载失败, 点击重新加载";
             break;
     }
 }
+
+- (void)onClickSelf {
+    
+    if (_state != ClickToReload) {
+        return;
+    }
+    
+    _tipsLabel.hidden = NO;
+    _tipsActivity.hidden = NO;
+    _tipsLabel.text = @"重新加载中..";
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(loadMoreCellClickedToReload)]) {
+        [_delegate loadMoreCellClickedToReload];
+    }
+}
+
 @end

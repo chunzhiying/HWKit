@@ -34,10 +34,12 @@ typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField *t
 
 @end
 
+#define Making_iOS8_Customize
 
+//#xx# for Red, &xx& for Blue. (default Black)
 @interface HWAlertController : UIView
 
-//without textfield, #xx# for DestructiveStyle
+//without textfield
 - (instancetype)initWithTitle:(NSString *)title
                       message:(NSString *)message
                         style:(HWAlertControllerStyle)style

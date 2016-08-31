@@ -18,15 +18,16 @@ extern NSString * const onTabbarChangeNotification;
 
 @protocol RefreshDelegate <NSObject>
 
-@required - (void)refreshData:(RefreshDataCallBack)callBack;
-@optional - (void)cancelRefresh;
+@required - (void)pullToRefresh:(PullToRefreshView *)pullToRefresh refreshData:(RefreshDataCallBack)callBack;
+@optional - (void)cancelRefreshingInPullToRefresh:(PullToRefreshView *)pullToRefresh;
 
 @end
 
 
 @protocol LoadMoreDelegate <NSObject>
 
-@required - (void)loadMoreData:(LoadMoreDataCallBack)callBack;
+@required - (void)pullToRefresh:(PullToRefreshView *)pullToRefresh loadMoreData:(LoadMoreDataCallBack)callBack;
+@optional - (CGFloat)heightOfLoadMoreCellInPullToRefresh:(PullToRefreshView *)pullToRefresh;
 
 @end
 
@@ -70,6 +71,8 @@ extern NSString * const onTabbarChangeNotification;
 @property (nonatomic, strong) UIView *tableHeaderView;
 @property (nonatomic, strong) UIView *tableFooterView;
 
+@property (nonatomic) BOOL allowSimultaneousRecognition; //YES, tableView allow simultaneous recognition, default NO
+
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style;
 - (instancetype)initWithConstrain:(UIEdgeInsets)constrain style:(UITableViewStyle)style addToParentView:(UIView *)parentView; //Already add to parentView.
 
@@ -88,13 +91,22 @@ extern NSString * const onTabbarChangeNotification;
 @property (nonatomic) BOOL scrollEnabled;
 @property (nonatomic) BOOL allowsSelection;
 
+@property (nonatomic) BOOL showsHorizontalScrollIndicator;
+@property (nonatomic) BOOL showsVerticalScrollIndicator;
+
 - (void)beginUpdates;
 - (void)endUpdates;
+
+- (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation;
+- (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation;
+
 - (void)insertRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
 - (void)deleteRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
 - (void)reloadRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
 
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated;
+
+- (CGRect)rectForSection:(NSInteger)section;
 
 @end
 

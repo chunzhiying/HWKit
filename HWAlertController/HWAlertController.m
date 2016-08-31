@@ -11,8 +11,21 @@
 
 #define isIOS8 ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0)
 
+#define BlackColor [UIColor colorWithRed:51.f/255.f green:51.f/255.f blue:51.f/255.f alpha:1]
+#define BlueColor [UIColor colorWithRed:60.f/255.f green:146.f/255.f blue:232.f/255.f alpha:1]
+#define RedColor [UIColor colorWithRed:243.f/255.f green:87.f/255.f blue:91.f/255.f alpha:1]
+
 #define Block_Index @"Index"
 #define Block_TextFields @"TextFields"
+
+#define Symbol_Red @"#"
+#define Symbol_Blue @"&"
+
+#define ButtonId @".Id"
+#define AddButtonId(string) [NSString stringWithFormat:@"%@%@", string, ButtonId]
+#define ClearButtonId(string) [string substringToIndex:string.length - ButtonId.length]
+#define HasButtonId(string) \
+(string.length > ButtonId.length && [[string substringFromIndex:string.length - ButtonId.length] isEqualToString:ButtonId])
 
 #define SafeBlock(atBlock, ...) \
     if(atBlock) {\
@@ -23,7 +36,7 @@
     __weak __typeof(self) weakSelf = self;
 
 #define StrongSelf \
-    if (!weakSelf) { return; } \
+if (!weakSelf) { return; } \
     __strong __typeof(weakSelf) strongSelf = weakSelf;
 
 
@@ -58,6 +71,10 @@
     return objc_getAssociatedObject(self, @selector(alertWindow));
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (void)show {
     self.alertWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.alertWindow.rootViewController = [UIViewController new];
@@ -71,6 +88,15 @@
     [self.alertWindow.rootViewController presentViewController:self animated:YES completion:nil];
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    
+#ifdef Making_iOS8_Customize
+    self.view.tintColor = BlackColor;
+    [self getSubView:self.view];
+#endif
+}
+
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
@@ -78,12 +104,68 @@
     self.alertWindow = nil;
 }
 
-- (BOOL)shouldAutorotate {
-    return NO;
+- (void)getSubView:(UIView *)view {
+    
+    if ([view isKindOfClass:[UILabel class]]) {
+        [self paserLabelText:(UILabel *)view];
+        return;
+    }
+    
+    if ([view isKindOfClass:[UIImageView class]]
+        || [view isKindOfClass:[UITextField class]]
+        || [view isKindOfClass:[UITextView class]]) {
+        return;
+    }
+    
+    for (UIView *sub in view.subviews) {
+        [self getSubView:sub];
+    }
+}
+
+- (void)paserLabelText:(UILabel *)label {
+    
+    if (!(label.text.length != 0 && HasButtonId(label.text))) {
+        return;
+    }
+    
+    NSString *realText = ClearButtonId(label.text);
+    label.font = [UIFont systemFontOfSize:15];
+    label.text = realText;
+    
+    if (realText.length != [self checkStyle:Symbol_Red withTitle:realText].length) {
+        label.textColor = RedColor;
+        label.tintColor = RedColor;
+        label.text = [self checkStyle:Symbol_Red withTitle:realText];
+    }
+    else if (realText.length != [self checkStyle:Symbol_Blue withTitle:realText].length) {
+        label.textColor = BlueColor;
+        label.tintColor = BlueColor;
+        label.text = [self checkStyle:Symbol_Blue withTitle:realText];
+    }
+    
+}
+
+- (NSString *)checkStyle:(NSString *)symbol withTitle:(NSString *)title {
+    if (title.length >= 3
+        && [[title substringToIndex:1] isEqualToString:symbol]
+        && [[title substringFromIndex:title.length - 1] isEqualToString:symbol])
+    {
+        title = [title substringWithRange:NSMakeRange(1, title.length - 2)];
+    }
+    return title;
 }
 
 @end
 
+@implementation UILabel (TintColor)
+
+#ifdef Making_iOS8_Customize
+- (void)tintColorDidChange {
+    self.tintColor = self.textColor;
+}
+#endif
+
+@end
 
 #pragma mark - HWAlertController Imp
 
@@ -207,6 +289,10 @@
         [strongSelf removeFromSuperview];
     };
     
+#ifdef Making_iOS8_Customize
+    cancelButtonTitle = AddButtonId(cancelButtonTitle);
+#endif
+    
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelButtonTitle
                                                            style:UIAlertActionStyleCancel handler:cancelActionBlock];
     [_alertController addAction:cancelAction];
@@ -219,6 +305,7 @@
     for (NSInteger i = 0; i < otherButtonTitles.count; i++)
     {
         void (^ otherActionBlock)(UIAlertAction *) = ^(UIAlertAction *action) {
+            
             StrongSelf
             NSArray *textFields = [[NSArray alloc] initWithArray:strongSelf->_alertController.textFields];
             SafeBlock(strongSelf.otherButtonsBlock, [HWAlertBlockData initWithBase:@{Block_Index : @(i),
@@ -231,11 +318,19 @@
             continue;
         }
         
+#ifdef Making_iOS8_Customize
+        UIAlertAction *otherAction = [UIAlertAction actionWithTitle:AddButtonId(title)
+                                                              style: UIAlertActionStyleDefault
+                                                            handler:otherActionBlock];
+        [_alertController addAction:otherAction];
+#else
         NSString *actualTitle = [self checkIfDestructiveStyle:title];
         UIAlertAction *otherAction = [UIAlertAction actionWithTitle:actualTitle
                                                               style:actualTitle.length != title.length ? UIAlertActionStyleDestructive : UIAlertActionStyleDefault
                                                             handler:otherActionBlock];
         [_alertController addAction:otherAction];
+#endif
+        
     }
     
 }
@@ -364,8 +459,8 @@
 #pragma mark - Custom
 - (NSString *)checkIfDestructiveStyle:(NSString *)title {
     if (title.length >= 3
-        && [[title substringToIndex:1] isEqualToString:@"#"]
-        && [[title substringFromIndex:title.length - 1] isEqualToString:@"#"])
+        && (([[title substringToIndex:1] isEqualToString:Symbol_Red] && [[title substringFromIndex:title.length - 1] isEqualToString:Symbol_Red])
+            || ([[title substringToIndex:1] isEqualToString:Symbol_Blue] && [[title substringFromIndex:title.length - 1] isEqualToString:Symbol_Blue])))
     {
         title = [title substringWithRange:NSMakeRange(1, title.length - 2)];
     }

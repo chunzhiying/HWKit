@@ -14,6 +14,7 @@
 #import "UICenter.h"
 #import "NetDisconnectView.h"
 #import "RefreshHeader_Macro.h"
+#import "PullToRefreshCustomTable.h"
 
 NSString * const onTabbarChangeNotification = @"onTabbarChangeNotification";
 
@@ -25,12 +26,18 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     RefreshFailed
 };
 
+typedef NS_ENUM(NSInteger,  QueryState) {
+    QueryState_Success,
+    QueryState_Failed,
+    QueryState_Quering,
+    QueryState_TimeOut
+};
 
-@interface PullToRefreshView() <UITableViewDelegate, UITableViewDataSource, NetDisconnectViewDelegate> {
+@interface PullToRefreshView() <UITableViewDelegate, UITableViewDataSource, NetDisconnectViewDelegate, LoadMoreCellDelegate> {
     
     RefreshHeader_DEC
     
-    UITableView* _tableView;
+    PullToRefreshCustomTable *_tableView;
     NSInteger _tableViewTopDistance;
     
     NetDisconnectView *_netDisconnectView;
@@ -43,14 +50,15 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     BOOL _canRefresh;
     BOOL _canLoadMore;
     
-    BOOL _refreshFailed;
     BOOL _autoRefresh;
     
     BOOL _showNoContentView;
     
 }
-@property (nonatomic) BOOL isGetRefreshData;
-@property (nonatomic) BOOL isGetLoadMoreData;
+@property (nonatomic, strong) LoadMoreCell *loadMoreCell;
+
+@property (nonatomic) QueryState refreshQueryState;
+@property (nonatomic) QueryState loadMoreQueryState;
 
 @property (nonatomic) RefreshingState refreshingState;
 @property (nonatomic) NSInteger newDataCount;
@@ -65,7 +73,7 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style {
     self = [super initWithFrame:frame];
     if (self) {
-        _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height) style:style];
+        _tableView = [[PullToRefreshCustomTable alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height) style:style];
         [self initTableView];
     }
     return self;
@@ -78,7 +86,7 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _tableView = [UITableView new];
+        _tableView = [PullToRefreshCustomTable new];
         [self initTableView];
         [self setConstrain:UIEdgeInsetsMake(0, 0, 0, 0) withSubView:_tableView andParentView:self];
     }
@@ -108,6 +116,9 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     _tableViewTopDistance = distance;
     
     _sectionCount = 1;
+    
+    _refreshQueryState = QueryState_Success;
+    _loadMoreQueryState = QueryState_Success;
     
     [self initRefreshUI];
     [self initNotification];
@@ -165,7 +176,7 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 - (instancetype)initWithConstrain:(UIEdgeInsets)constrain style:(UITableViewStyle)style addToParentView:(UIView *)parentView {
     self = [super initWithFrame:CGRectZero];
     if (self) {
-        _tableView = [[UITableView alloc] initWithFrame:CGRectZero style:style];
+        _tableView = [[PullToRefreshCustomTable alloc] initWithFrame:CGRectZero style:style];
         [self initTableView];
         [parentView addSubview:self];
         
@@ -258,6 +269,16 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 }
 
 #pragma mark - Getter & Setter
+- (LoadMoreCell *)loadMoreCell {
+    if (!_loadMoreCell) {
+        _loadMoreCell = [[[NSBundle mainBundle] loadNibNamed:@"LoadMoreCell" owner:nil options:nil] lastObject];
+        _loadMoreCell.delegate = self;
+        _loadMoreCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        [_loadMoreCell setLoadMoreType:CanLoadMore];
+    }
+    return _loadMoreCell;
+}
+
 - (void)setFrame:(CGRect)frame {
     [self setTranslatesAutoresizingMaskIntoConstraints:YES];
     [super setFrame:frame];
@@ -295,11 +316,16 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     _noContentView.frame = _tableView.bounds;
 }
 
+-(void)setAllowSimultaneousRecognition:(BOOL)allowSimultaneousRecognition {
+    _allowSimultaneousRecognition = allowSimultaneousRecognition;
+    _tableView.allowSimultaneousRecognition = allowSimultaneousRecognition;
+}
+
+
 #pragma mark - RequestTimer method
 - (void)startTimer
 {
     [self stopTimer];
-    _refreshFailed = NO;
     _requestTimer = [NSTimer timerWithTimeInterval:TimerWaitingDuration
                                             target:self selector:@selector(requestTimeout) userInfo:nil repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:_requestTimer forMode:NSRunLoopCommonModes];
@@ -316,7 +342,7 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 - (void)requestTimeout
 {
     if (_refreshingState == Refreshing) {
-        _refreshFailed = YES;
+        _refreshQueryState = QueryState_TimeOut;
     }
     _refreshingState = RefreshFailed;
 }
@@ -327,7 +353,7 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
         return;
     }
     _refreshingState = WillRefresh;
-    _isGetRefreshData = NO;
+    _refreshQueryState = QueryState_Success;
     
     [self stopTimer];
     
@@ -354,8 +380,10 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     
     if (_refreshDelegate) {
         
+        _refreshQueryState = QueryState_Quering;
+        
         ATWeakSelf
-        [_refreshDelegate refreshData:^(BOOL success) {
+        [_refreshDelegate pullToRefresh:self refreshData:^(BOOL success) {
             
             ATStrongSelfWithEnsureWeakSelf
             if (strongSelf.netDisconnectBlock) {
@@ -363,7 +391,7 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
                 strongSelf.netDisconnectBlock = nil;
             }
             
-            strongSelf.isGetRefreshData = success;
+            strongSelf.refreshQueryState = success ? QueryState_Success : QueryState_Failed;
         }];
     }
 }
@@ -414,6 +442,33 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     [self autoRefresh];
 }
 
+#pragma mark - LoadMoreCell Delegate
+- (void)loadMoreData {
+    _loadMoreQueryState = QueryState_Quering;
+    [self.loadMoreCell setLoadMoreType:CanLoadMore];
+    
+    ATWeakSelf
+    [_loadMoreDelegate pullToRefresh:weakSelf loadMoreData:^(BOOL success) {
+        ATStrongSelfWithEnsureWeakSelf
+        if (success) {
+            strongSelf.loadMoreQueryState = QueryState_Success;
+        } else {
+            strongSelf.loadMoreQueryState = QueryState_Failed;
+            [strongSelf.loadMoreCell setLoadMoreType:ClickToReload];
+        }
+    }];
+
+}
+
+- (void)resetLoadMoreCell {
+    _loadMoreCell = nil;
+    _loadMoreQueryState = QueryState_Success;
+}
+
+- (void)loadMoreCellClickedToReload {
+    [self loadMoreData];
+}
+
 #pragma mark - Scroll Delegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -453,8 +508,8 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     if (-scrollView.contentOffset.y > RefreshHeaderHeight) {
         if (scrollView.dragging) {
             [self canRefresh];
-            if (_refreshDelegate && [_refreshDelegate respondsToSelector:@selector(cancelRefresh)]) {
-                [_refreshDelegate cancelRefresh];
+            if (_refreshDelegate && [_refreshDelegate respondsToSelector:@selector(cancelRefreshingInPullToRefresh:)]) {
+                [_refreshDelegate cancelRefreshingInPullToRefresh:self];
             }
             
         }
@@ -474,24 +529,24 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
     
     if (RefreshHeader_AnimationCheck) {
+        
         if (_refreshingState == WillRefresh){
             return;
         }
         
-        if ([NetworkInfo sharedObject].networkState == NetworkStateNotReachable) {
-            [self refreshFailed];
-            return;
-        }
-        
-        if (_isGetRefreshData) {
-            [self refreshSucceed];
-            [self reloadData];
-            return;
-        }
-        
-        if(_refreshFailed){
-            [self refreshFailed];
-            return;
+        switch (_refreshQueryState) {
+            case QueryState_Success:
+                [self refreshSucceed];
+                [self reloadData];
+                return;
+                
+            case QueryState_Failed:
+            case QueryState_TimeOut:
+                [self refreshFailed];
+                return;
+                
+            default:
+                break;
         }
         
         RefreshHeader_DoRefreshAnimation
@@ -508,7 +563,7 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 - (void)reloadDataWithCounts:(NSInteger)newDataCount {
     _newDataCount = newDataCount;
     _showNoContentView = NO;
-    _isGetLoadMoreData = YES;
+    [self resetLoadMoreCell];
     [self reloadData];
 }
 
@@ -526,6 +581,11 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (_canLoadMore && indexPath.section == _sectionCount) {
+        return NO;
+    }
+    
     if (_pullToRefreshDelegate && [_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:canEditRowAtIndexPath:)]) {
         return [_pullToRefreshDelegate pullToRefresh:tableView canEditRowAtIndexPath:indexPath];
     }
@@ -566,8 +626,13 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     }
     
     if (_pullToRefreshDelegate != nil) {
+        
         if (_canLoadMore && section == _sectionCount) {
+            if (_sectionCount == 0) {
+                 [self checkIfNoContent:0];
+            }
             return 1;
+            
         } else {
             NSInteger dataCount = [_pullToRefreshDelegate pullToRefresh:tableView numberOfRowsInSection:section];
             
@@ -625,37 +690,31 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     
     if (_canLoadMore && indexPath.section == _sectionCount && indexPath.row == 0) {
         
-        LoadMoreCell *cell = [[[NSBundle mainBundle] loadNibNamed:@"LoadMoreCell" owner:nil options:nil] lastObject];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        
         if ([NetworkInfo sharedObject].networkState == NetworkStateNotReachable) {
-            [cell setLoadMoreType:NetworkNotReachable];
-            return cell;
+            [self.loadMoreCell setLoadMoreType:NetworkNotReachable];
+            return self.loadMoreCell;
         }
+
         
         if (_newDataCount > 0) {
             
-            [cell setLoadMoreType:LoadMoreData];
-            
-            if (_isGetLoadMoreData) {
-                _isGetLoadMoreData = NO;
-                
-                ATWeakSelf
-                Delay(0.5, ^{
-                    [_loadMoreDelegate loadMoreData:^(BOOL success) {
-                        ATStrongSelfWithEnsureWeakSelf
-                        strongSelf.isGetLoadMoreData = success;
-                        
-                    }];
-                })
-                
+            switch (_loadMoreQueryState) {
+                case QueryState_Success:
+                {
+                    Delay(0.5, ^{
+                        [self loadMoreData];
+                    })
+                    break;
+                }
+                default:
+                    break;
             }
-  
+            
         } else {
-            [cell setLoadMoreType:NoMoreData];
+            [self.loadMoreCell setLoadMoreType:NoMore];
         }
         
-        return cell;
+        return self.loadMoreCell;
         
     } else {
         return [_pullToRefreshDelegate pullToRefresh:tableView cellForRowAtIndexPath:indexPath];
@@ -674,7 +733,13 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     if (_pullToRefreshDelegate != nil && [_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:heightForRowAtIndexPath:)])
     {
         if (_canLoadMore && indexPath.section == _sectionCount) {
-            return LoadMoreCellHeight;
+            
+            if (_loadMoreDelegate && [_loadMoreDelegate respondsToSelector:@selector(heightOfLoadMoreCellInPullToRefresh:)]) {
+                return [_loadMoreDelegate heightOfLoadMoreCellInPullToRefresh:self];
+            } else {
+                return LoadMoreCellHeight;
+            }
+            
         } else {
             return [_pullToRefreshDelegate pullToRefresh:tableView heightForRowAtIndexPath:indexPath];
         }
@@ -714,7 +779,6 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 }
 
 @end
-
 
 
 @implementation PullToRefreshView (Addition)
@@ -757,6 +821,23 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     return _tableView.allowsSelection;
 }
 
+#pragma mark ScrollIndicator
+- (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator {
+    _tableView.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+}
+
+- (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator {
+    _tableView.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+}
+
+- (BOOL)showsVerticalScrollIndicator {
+    return _tableView.showsVerticalScrollIndicator;
+}
+
+- (BOOL)showsHorizontalScrollIndicator {
+    return _tableView.showsHorizontalScrollIndicator;
+}
+
 #pragma mark TableView Public
 - (void)beginUpdates {
     [_tableView beginUpdates];
@@ -766,8 +847,32 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
     [_tableView endUpdates];
 }
 
+- (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
+    [_tableView insertSections:sections withRowAnimation:animation];
+}
+
+- (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation {
+    [_tableView deleteSections:sections withRowAnimation:animation];
+}
+
 - (void)deleteRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
+    
+    if (indexPaths.count == 0) {
+        return;
+    }
+    
+    NSInteger deletedSection = [(NSIndexPath *)indexPaths.firstObject section];
+    NSInteger currentRow = [_pullToRefreshDelegate pullToRefresh:_tableView numberOfRowsInSection:deletedSection];
+    BOOL shouldDeleteSecton = currentRow == 0;
+    
     [_tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:animation];
+
+    if (_canLoadMore && _sectionCount == 1 && shouldDeleteSecton) {
+        NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
+        [indexes addIndex:deletedSection];
+        [self deleteSections:indexes withRowAnimation:animation];
+    }
+    
 }
 
 - (void)insertRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
@@ -782,6 +887,10 @@ typedef NS_ENUM(NSInteger, RefreshingState) {
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated
 {
     [_tableView scrollToRowAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
+}
+
+- (CGRect)rectForSection:(NSInteger)section {
+    return [_tableView rectForSection:section];
 }
 
 @end

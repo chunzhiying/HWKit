@@ -10,11 +10,20 @@
 
 typedef NS_ENUM(NSInteger, LoadMoreState){
     NetworkNotReachable,
-    NoMoreData,
-    LoadMoreData
+    NoMore,                 //已经到底啦
+    CanLoadMore,            //上拉加载更多
+    ClickToReload           //点击重新加载
 };
 
+@protocol LoadMoreCellDelegate <NSObject>
+
+- (void)loadMoreCellClickedToReload;
+
+@end
+
 @interface LoadMoreCell : UITableViewCell
+
+@property (nonatomic, weak) id<LoadMoreCellDelegate> delegate;
 
 - (void)setLoadMoreType:(LoadMoreState)state;
 

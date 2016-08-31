@@ -15,10 +15,15 @@
 #define defaultTabScrollHeight 36
 #define defaultTabIemWidth 80
 
+#define defaultSelectLineMask 10
+
+#define TabItemMaxScale 1.1
+
 #define defaultSeparateLineColor [UIColor colorWithRed:217.f/255.f green:217.f/255.f blue:217.f/255.f alpha:1]
 #define defaultTabScrollBgColor [UIColor whiteColor]
 
-#define defaultSelectLineMask 10
+#define WidthOf(view) view.bounds.size.width
+#define HeightOf(view) view.bounds.size.height
 
 @interface UIView (ChangePosition)
 
@@ -44,9 +49,10 @@
 @end
 
 @interface TabItem : UIView {
-    UIColor *_normalColor;
-    UIColor *_highlightColor;
     UILabel *_label;
+    UILabel *_highlightLabel;
+    
+    HWPageSelectedType _style;
     CAShapeLayer *_dot;
 }
 
@@ -60,12 +66,11 @@
                     withTitle:(NSString *)title
               withNormalColor:(UIColor *)normalColor
            withHighlightColor:(UIColor *)highlightColor
-                      showDot:(BOOL)showDot
+               separatorStyle:(HWPageSelectedType)style
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _normalColor = normalColor;
-        _highlightColor = highlightColor;
+        _style = style;
         
         _label = [[UILabel alloc] initWithFrame:self.bounds];
         _label.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -74,29 +79,62 @@
         _label.text = title;
         _label.textColor = normalColor;
         
+        _highlightLabel = [[UILabel alloc] initWithFrame:self.bounds];
+        _highlightLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _highlightLabel.font = [UIFont systemFontOfSize:15];
+        _highlightLabel.textAlignment = NSTextAlignmentCenter;
+        _highlightLabel.text = title;
+        _highlightLabel.textColor = highlightColor;
+        
         _dot = [CAShapeLayer layer];
         _dot.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, defaultItemDotDiameter, defaultItemDotDiameter)].CGPath;
         _dot.fillColor = highlightColor.CGColor;
         _dot.strokeColor = highlightColor.CGColor;
-        if (showDot) {
+        
+        if (_style == HWPageSelectedType_Dot) {
             [self.layer addSublayer:_dot];
         }
-        
         [self addSubview:_label];
+        [self addSubview:_highlightLabel];
     }
     return self;
 }
 
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
-    _dot.position = CGPointMake((self.bounds.size.width - defaultItemDotDiameter) / 2,
-                                self.bounds.size.height - defaultItemDotDiameter - 3);
+    _dot.position = CGPointMake((WidthOf(self) - defaultItemDotDiameter) / 2,
+                                HeightOf(self) - defaultItemDotDiameter - 3);
 }
 
 - (void)setIsSelected:(BOOL)isSelected {
     _isSelected = isSelected;
-    _label.textColor = isSelected ? _highlightColor : _normalColor;
     _dot.hidden = !isSelected;
+    
+    _label.alpha = isSelected ? 0 : 1;
+    _highlightLabel.alpha = isSelected ? 1 : 0;
+    
+    if (_style == HWPageSelectedType_Line) {
+        return;
+    }
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        _label.transform = isSelected ? CGAffineTransformMakeScale(TabItemMaxScale, TabItemMaxScale) : CGAffineTransformMakeScale(1, 1);
+        _highlightLabel.transform = _label.transform;
+    }];
+}
+
+- (void)gradualChangeTo:(CGFloat)value {
+    _label.alpha = 1 - value;
+    _highlightLabel.alpha = value;
+    _dot.hidden = YES;
+    
+    if (_style == HWPageSelectedType_Line) {
+        return;
+    }
+    
+    _label.transform = CGAffineTransformMakeScale(1 + (TabItemMaxScale - 1) * value,
+                                                  1 + (TabItemMaxScale - 1) * value);
+    _highlightLabel.transform = _label.transform;
 }
 
 @end
@@ -193,7 +231,7 @@
 
 #pragma mark - Custom Method
 - (void)initSeparateline {
-    _separateline = [[UIView alloc] initWithFrame:CGRectMake(0, _tabScroll.bounds.size.height, _tabScroll.bounds.size.width, 0.5)];
+    _separateline = [[UIView alloc] initWithFrame:CGRectMake(0, HeightOf(_tabScroll), WidthOf(_tabScroll), 0.5)];
     _separateline.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _separateline.backgroundColor = defaultSeparateLineColor;
     [self addSubview:_separateline];
@@ -227,7 +265,7 @@
                                                 withTitle:[_dataSource pageView:self titleAtIndex:index]
                                           withNormalColor:_tabTitleNormalColor
                                        withHighlightColor:_tabTitleHighlightColor
-                                                  showDot:_selectedType == HWPageSelectedType_Dot];
+                                           separatorStyle:_selectedType];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickTabItem:)];
         [tabItem addGestureRecognizer:tap];
         [tabItem.layer setValue:@(index) forKey:tabItemTagKey];
@@ -282,6 +320,22 @@
     self.selectedIndex = [[gesture.view.layer valueForKey:tabItemTagKey] intValue];
 }
 
+- (void)handleGradualChangeWithContentOffset:(CGPoint)offset {
+    CGFloat selectedOffsetX = _selectedIndex * WidthOf(_pageScroll);
+    
+    if (offset.x <= 0 || offset.x >= (WidthOf(_pageScroll) * (_tabAry.count - 1))
+        || fabs(selectedOffsetX - offset.x) >=  (2 * WidthOf(_pageScroll))) {
+        return;
+    }
+    
+    TabItem *hideItem = [_tabAry objectAtIndex:_selectedIndex];
+    TabItem *showItem = [_tabAry objectAtIndex:offset.x > selectedOffsetX ? _selectedIndex + 1 : _selectedIndex - 1];
+    
+    CGFloat change = fabs(selectedOffsetX - offset.x) / WidthOf(_pageScroll);
+    [hideItem gradualChangeTo:1 - change];
+    [showItem gradualChangeTo:change];
+}
+
 #pragma mark - Setter 
 - (void)setSelectedIndex:(NSInteger)selectedIndex {
     
@@ -298,7 +352,7 @@
         visibleItemIndex--;
     }
     
-    [_pageScroll setContentOffset:CGPointMake(_pageScroll.bounds.size.width * selectedIndex, 0) animated:NO];
+    [_pageScroll setContentOffset:CGPointMake(WidthOf(_pageScroll) * selectedIndex, 0) animated:NO];
     
     if (_isTabScrollCanRoll) {
         [_tabScroll scrollRectToVisible:CGRectMake(_tabItemWidth * visibleItemIndex, 0, _tabItemWidth, _tabScrollHeight) animated:YES];
@@ -329,8 +383,10 @@
 #pragma mark - ScrollView Delegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (scrollView == _pageScroll) {
-        [_selectedLine setX:_selectedLineDiffX + scrollView.contentOffset.x * _tabItemWidth / _pageScroll.bounds.size.width];
-        _selectedTempX = scrollView.contentOffset.x * _tabItemWidth / _pageScroll.bounds.size.width + defaultSelectLineMask;
+        [_selectedLine setX:_selectedLineDiffX + scrollView.contentOffset.x * _tabItemWidth / WidthOf(_pageScroll)];
+        _selectedTempX = scrollView.contentOffset.x * _tabItemWidth / WidthOf(_pageScroll) + defaultSelectLineMask;
+
+        [self handleGradualChangeWithContentOffset:scrollView.contentOffset];
     }
     
     if (scrollView == _tabScroll) {
@@ -341,7 +397,7 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if (scrollView == _pageScroll) {
-        self.selectedIndex = scrollView.contentOffset.x / _pageScroll.bounds.size.width;
+        self.selectedIndex = scrollView.contentOffset.x / WidthOf(_pageScroll);
     }
 }
 
@@ -366,12 +422,12 @@
     NSInteger pageCount = _tabAry.count;
     
     _tabScroll.frame = CGRectMake(0, 0, frame.size.width, _tabScrollHeight);
-    _tabItemWidth = _isTabScrollCanRoll ? defaultTabIemWidth : _tabScroll.bounds.size.width / pageCount;
-    _tabScroll.contentSize = CGSizeMake(_isTabScrollCanRoll ? _tabItemWidth * pageCount : _tabScroll.bounds.size.width, _tabScrollHeight);
+    _tabItemWidth = _isTabScrollCanRoll ? defaultTabIemWidth : WidthOf(_tabScroll) / pageCount;
+    _tabScroll.contentSize = CGSizeMake(_isTabScrollCanRoll ? _tabItemWidth * pageCount : WidthOf(_tabScroll), _tabScrollHeight);
     
     for (NSInteger index = 0; index < _tabAry.count; index++) {
         TabItem *tabItem = _tabAry[index];
-        tabItem.frame = CGRectMake(index * _tabItemWidth, 0, _tabItemWidth, _tabScroll.bounds.size.height);
+        tabItem.frame = CGRectMake(index * _tabItemWidth, 0, _tabItemWidth, HeightOf(_tabScroll));
     }
     
 }
@@ -386,11 +442,11 @@
 - (void)resetPageScrollFrame:(CGRect)frame
 {
     _pageScroll.frame = CGRectMake(0, _tabScrollHeight + _pageOffset, frame.size.width, frame.size.height - _tabScrollHeight - _pageOffset);
-    _pageScroll.contentSize = CGSizeMake(_pageAry.count * _pageScroll.bounds.size.width, _pageScroll.bounds.size.height);
+    _pageScroll.contentSize = CGSizeMake(_pageAry.count * WidthOf(_pageScroll), HeightOf(_pageScroll));
     
     for (NSInteger index = 0; index < _pageAry.count; index++) {
         UIView *contentView = _pageAry[index];
-        contentView.frame = CGRectMake(index * _pageScroll.bounds.size.width, 0, _pageScroll.bounds.size.width, _pageScroll.bounds.size.height);
+        contentView.frame = CGRectMake(index * WidthOf(_pageScroll), 0, WidthOf(_pageScroll), HeightOf(_pageScroll));
     }
 }
 
