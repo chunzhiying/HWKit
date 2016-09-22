@@ -87,9 +87,19 @@
 - (void)onClickItem:(UITapGestureRecognizer *)tap {
     
     UIView<HWSelectable> *item = (UIView<HWSelectable> *)tap.view;
+    self.seletedIndex = [_items indexOfObject:item];
+    
+}
+
+#pragma mark - Setter
+- (void)setSeletedIndex:(NSUInteger)seletedIndex {
+    _seletedIndex = seletedIndex;
+    
     for (UIView<HWSelectable> *element in _items) {
         element.isSelected = NO;
     }
+    
+    UIView<HWSelectable> *item = [_items objectAtIndex:seletedIndex];
     item.isSelected = YES;
     
     if (_delegate && [_delegate respondsToSelector:@selector(scrollTagView:didClickItem:index:)]) {

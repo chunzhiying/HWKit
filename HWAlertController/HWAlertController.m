@@ -7,6 +7,7 @@
 //
 
 #import "HWAlertController.h"
+#import "HWFunctionalType.h"
 #import <objc/runtime.h>
 
 #define isIOS8 ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0)
@@ -14,6 +15,8 @@
 #define BlackColor [UIColor colorWithRed:51.f/255.f green:51.f/255.f blue:51.f/255.f alpha:1]
 #define BlueColor [UIColor colorWithRed:60.f/255.f green:146.f/255.f blue:232.f/255.f alpha:1]
 #define RedColor [UIColor colorWithRed:243.f/255.f green:87.f/255.f blue:91.f/255.f alpha:1]
+
+#define ImageTitleFlag @"ImageTitleFlag"
 
 #define Block_Index @"Index"
 #define Block_TextFields @"TextFields"
@@ -28,19 +31,17 @@
 (string.length > ButtonId.length && [[string substringFromIndex:string.length - ButtonId.length] isEqualToString:ButtonId])
 
 #define ChackIsSurroundBy(symbol, string) \
-    (string.length >= 3 && [[string substringToIndex:1] isEqualToString:symbol] && [[string substringFromIndex:string.length - 1] isEqualToString:symbol])
+(string.length >= 3 && [[string substringToIndex:1] isEqualToString:symbol] && [[string substringFromIndex:string.length - 1] isEqualToString:symbol])
 
 #define SafeBlock(atBlock, ...) \
-    if(atBlock) {\
-        atBlock(__VA_ARGS__);\
-    }\
+if(atBlock) { atBlock(__VA_ARGS__); }
 
 #define WeakSelf \
-    __weak __typeof(self) weakSelf = self;
+__weak __typeof(self) weakSelf = self;
 
 #define StrongSelf \
 if (!weakSelf) { return; } \
-    __strong __typeof(weakSelf) strongSelf = weakSelf;
+__strong __typeof(weakSelf) strongSelf = weakSelf;
 
 
 @implementation HWAlertBlockData
@@ -133,7 +134,7 @@ if (!weakSelf) { return; } \
     }
     
     NSString *realText = ClearButtonId(label.text);
-    label.font = [UIFont systemFontOfSize:19];
+    label.font = [UIFont systemFontOfSize:20];
     label.text = realText;
     
     if (realText.length != [self checkStyle:Symbol_Red withTitle:realText].length) {
@@ -186,6 +187,7 @@ if (!weakSelf) { return; } \
     UIAlertView *_alert;
     UIActionSheet *_actionSheet;
     UIAlertController *_alertController;
+    
 }
 
 @property (nonatomic, copy) AlertBlock cancelBlock;
@@ -205,6 +207,7 @@ if (!weakSelf) { return; } \
             otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles otherButtonsBlock:(AlertOtherButtonsBlock)otherButtonsBlock
 {
     [self dismissWithCancelButtonClicked];
+    [self clearUI];
     
     self = [super initWithFrame:[UIScreen mainScreen].bounds];
     if (self) {
@@ -238,6 +241,7 @@ if (!weakSelf) { return; } \
             otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles otherButtonsBlock:(AlertOtherButtonsBlock)otherButtonsBlock
 {
     [self dismissWithCancelButtonClicked];
+    [self clearUI];
     
     if (textStyle == HWAlertViewStyleDefault) {
         return [self initWithTitle:title message:message style:HWAlertControllerStyleAlert
@@ -276,6 +280,12 @@ if (!weakSelf) { return; } \
         
     }
     return self;
+}
+
+- (void)clearUI {
+    _alertController = nil;
+    _alert = nil;
+    _actionSheet = nil;
 }
 
 #pragma mark - Setup Main
@@ -357,7 +367,7 @@ if (!weakSelf) { return; } \
             _alert = [[UIAlertView alloc] initWithTitle:title
                                                 message:message
                                                delegate:self
-                                      cancelButtonTitle:cancelButtonTitle
+                                      cancelButtonTitle:[self checkIfDestructiveStyle:cancelButtonTitle]
                                       otherButtonTitles:nil];
             
             for (NSString *title in otherButtonTitles) {
@@ -489,6 +499,12 @@ if (!weakSelf) { return; } \
     
     [parentView addSubview:self];
     
+    if (_alert
+        && [[_alert.layer valueForKey:ImageTitleFlag] isEqualToString:ImageTitleFlag]) {
+        [_alert show];
+        return;
+    }
+    
     if (isIOS8 && _alertController) {
         [_alertController show];
         return;
@@ -599,6 +615,70 @@ if (!weakSelf) { return; } \
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self removeFromSuperview];
     });
+}
+
+@end
+
+@implementation HWAlertController (Image)
+
+#define MaxImageWidth 270
+#define Spacing 15
+
+- (instancetype)initWithImage:(UIImage *)image
+                      message:(NSString *)message
+            cancelButtonTitle:(NSString *)cancelButtonTitle cancelButtonBlock:(AlertBlock)cancelBlock
+            otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles otherButtonsBlock:(AlertOtherButtonsBlock)otherButtonsBlock
+{
+    [self dismissWithCancelButtonClicked];
+    [self clearUI];
+    
+    self = [super initWithFrame:[UIScreen mainScreen].bounds];
+    if (self) {
+        _style = HWAlertControllerStyleAlert;
+        _alertTextStyle = HWAlertViewStyleDefault;
+        
+        self.cancelBlock = cancelBlock;
+        self.otherButtonsBlock = otherButtonsBlock;
+        self.backgroundColor = [UIColor clearColor];
+        
+        [self setupForIOS7:nil message:nil style:_style
+         cancelButtonTitle:cancelButtonTitle cancelButtonBlock:cancelBlock
+         otherButtonTitles:otherButtonTitles otherButtonsBlock:otherButtonsBlock];
+        
+        
+        UIView *bgView = [UIView new];
+        UIFont *font = [UIFont systemFontOfSize:15];
+        
+        if (message.length > 0) {
+            
+            bgView.frame = CGRectMake(0, 0, MaxImageWidth, image.size.height + font.lineHeight + 3 * Spacing);
+            
+            [bgView addSubview:[UILabel new].then(^(UILabel *label) {
+                label.font = font;
+                label.text = message;
+                label.textAlignment = NSTextAlignmentCenter;
+                label.frame = CGRectMake(Spacing, bgView.frame.size.height - font.lineHeight - Spacing,
+                                         MaxImageWidth - Spacing * 2, font.lineHeight);
+                label.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+            })];
+            
+            
+        } else {
+            bgView.frame = CGRectMake(0, 0, MaxImageWidth, image.size.height + 2 * Spacing);
+        }
+        
+        [bgView addSubview:[UIImageView new].then(^(UIImageView *imageView) {
+            imageView.image = image;
+            imageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+            imageView.frame = CGRectMake((MaxImageWidth - image.size.width) / 2, Spacing, image.size.width, image.size.height);
+        })];
+        
+        [_alert setValue:bgView forKey:@"accessoryView"];
+        [_alert.layer setValue:ImageTitleFlag forKey:ImageTitleFlag];
+        
+    }
+    
+    return self;
 }
 
 @end

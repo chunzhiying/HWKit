@@ -23,6 +23,19 @@
     };
 }
 
+- (id (^)(flatMapType))flatMap {
+    return ^(flatMapType block) {
+        id result;
+        for (id key in self.allKeys) {
+            id newElement = block(@{@"key":key, @"value":self[key]});
+            if (newElement) {
+                result = newElement;
+            }
+        }
+        return result;
+    };
+}
+
 - (NSDictionary *(^)(filterType block))filter {
     return ^(filterType block) {
         NSMutableDictionary *result = [NSMutableDictionary new];

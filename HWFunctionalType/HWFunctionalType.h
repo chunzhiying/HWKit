@@ -7,6 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+#define Interface(class, property) @interface class (FunctionalType_Basic)  property  @end
+#define Implementation(class, method) @implementation class (FunctionalType_Basic)  method  @end
+
+typedef void(^thenType)(id obj);
 
 typedef id(^mapType)(id element);
 typedef id(^mapWithIndexType)(id element, NSUInteger index);
@@ -16,11 +22,13 @@ typedef NSNumber *(^compareType)(id obj1, id obj2); //bool
 typedef NSNumber *(^filterType)(id obj1); //bool
 typedef NSComparisonResult(^sortType)(id obj1, id obj2);
 
+
+
 @protocol HWFunctionalType <NSObject>
 
 @optional
 @property (nonatomic, readonly) id<HWFunctionalType>(^map)(mapType);
-@property (nonatomic, readonly) id<HWFunctionalType>(^mapWithIndexType)(mapType);
+@property (nonatomic, readonly) id<HWFunctionalType>(^mapWithIndex)(mapWithIndexType);
 @property (nonatomic, readonly) id<HWFunctionalType>(^flatMap)(flatMapType);
 @property (nonatomic, readonly) id<HWFunctionalType>(^sort)(sortType);
 @property (nonatomic, readonly) id<HWFunctionalType>(^filter)(filterType);
@@ -28,3 +36,17 @@ typedef NSComparisonResult(^sortType)(id obj1, id obj2);
 @property (nonatomic, readonly) BOOL(^compare)(compareType);
 
 @end
+
+#define IFace_then \
+@property (nonatomic, readonly) id(^then)(thenType);
+
+#define Imp_then \
+- (id(^)(thenType block))then { return ^(thenType block) { block(self); return self;}; }
+
+
+Interface(NSObject, IFace_then)
+Interface(UIView, IFace_then)
+Implementation(NSObject, Imp_then)
+Implementation(UIView, Imp_then)
+
+

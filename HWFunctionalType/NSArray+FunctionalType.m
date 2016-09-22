@@ -41,6 +41,9 @@
     return ^(flatMapType block) {
         NSMutableArray *result = [NSMutableArray new];
         for (id element in self) {
+            if (!element || [element isKindOfClass:[NSNull class]]) {
+                continue;
+            }
             if ([element isKindOfClass:[NSArray class]]) {
                 NSArray *subResult = ((NSArray *)element).flatMap(block);
                 [result addObjectsFromArray:subResult];
@@ -57,7 +60,12 @@
 
 - (NSArray *(^)(sortType block))sort {
     return ^(sortType block) {
-        NSMutableArray *mAry = [[NSMutableArray alloc] initWithArray:self];
+        NSMutableArray *mAry;
+        if ([self isKindOfClass:[NSMutableArray class]]) {
+            mAry = (NSMutableArray *)self;
+        } else {
+            mAry = [[NSMutableArray alloc] initWithArray:self];
+        }
         [mAry sortUsingComparator:^NSComparisonResult(id obj1, id obj2){
             return block(obj1, obj2);
         }];

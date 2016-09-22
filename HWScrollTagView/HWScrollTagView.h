@@ -32,6 +32,7 @@
 @interface HWScrollTagView : UIView
 
 @property (nonatomic, weak) id<HWScrollTagDelegate> delegate;
+@property (nonatomic) NSUInteger seletedIndex;
 
 - (instancetype)initWithFrame:(CGRect)frame delegate:(id<HWScrollTagDelegate>)delegate;
 - (void)reloadData;

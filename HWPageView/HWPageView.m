@@ -243,6 +243,9 @@
     _selectedLine.backgroundColor = _tabTitleHighlightColor;
     _selectedLine.hidden = _selectedType != HWPageSelectedType_Line;
     
+    _selectedLineDiffX = defaultSelectLineMask;
+    _selectedTempX = defaultSelectLineMask;
+    
     [self addSubview:_selectedLine];
     [self resetSeletedLineFrame];
 }
@@ -363,7 +366,10 @@
     }
     
     _selectedPage = [_pageAry objectAtIndex:selectedIndex];
-    if (_delegate && [_delegate respondsToSelector:@selector(pageview:didChangeTabFromIndex:toIndex:)]) {
+    
+    if (_selectedIndex != selectedIndex
+        && _delegate && [_delegate respondsToSelector:@selector(pageview:didChangeTabFromIndex:toIndex:)])
+    {
         [_delegate pageview:self didChangeTabFromIndex:_selectedIndex toIndex:selectedIndex];
     }
     
@@ -434,9 +440,7 @@
 
 - (void)resetSeletedLineFrame
 {
-    _selectedLine.frame = CGRectMake(defaultSelectLineMask, _tabScrollHeight - 1, _tabItemWidth - 2 * defaultSelectLineMask, 2);
-    _selectedLineDiffX = defaultSelectLineMask;
-    _selectedTempX = defaultSelectLineMask;
+    _selectedLine.frame = CGRectMake(defaultSelectLineMask, _tabScrollHeight - 2, _tabItemWidth - 2 * defaultSelectLineMask, 2);
 }
 
 - (void)resetPageScrollFrame:(CGRect)frame

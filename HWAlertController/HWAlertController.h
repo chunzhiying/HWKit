@@ -62,6 +62,17 @@ typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField *t
 @end
 
 
+@interface HWAlertController (Image)
+
+// not support #xx#, &xx&
+- (instancetype)initWithImage:(UIImage *)image
+                      message:(NSString *)message
+            cancelButtonTitle:(NSString *)cancelButtonTitle cancelButtonBlock:(AlertBlock)cancelBlock
+            otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles otherButtonsBlock:(AlertOtherButtonsBlock)otherButtonsBlock;
+
+@end
+
+
 @interface HWAlertController (AutoDismiss)
 
 - (void)autoDismiss;
