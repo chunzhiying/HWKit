@@ -27,6 +27,10 @@ typedef void(^AlertOtherButtonsBlock)(HWAlertBlockData *data);
 typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField *textField);
 
 
+@interface HWAlertContainerController : UIViewController //for AutoRotation
+
+@end
+
 @interface HWAlertBlockData : NSObject
 
 @property (nonatomic) NSInteger index; //0, 1, 2, ...

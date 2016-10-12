@@ -35,6 +35,9 @@ typedef NSComparisonResult(^sortType)(id obj1, id obj2);
 @property (nonatomic, readonly) id(^reduce)(id, reduceType);
 @property (nonatomic, readonly) BOOL(^compare)(compareType);
 
+@property (nonatomic, readonly) id<HWFunctionalType>(^just)(NSUInteger count);
+@property (nonatomic, readonly) id<HWFunctionalType>(^justTail)(NSUInteger count);
+
 @end
 
 #define IFace_then \

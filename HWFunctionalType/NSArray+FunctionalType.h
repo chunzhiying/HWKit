@@ -20,6 +20,9 @@
 @property (nonatomic, readonly) id (^reduce)(id, reduceType);
 @property (nonatomic, readonly) BOOL(^compare)(compareType);
 
+@property (nonatomic, readonly) NSArray *(^just)(NSUInteger count);
+@property (nonatomic, readonly) NSArray *(^justTail)(NSUInteger count);
+
 @end
 
 @interface NSArray (FunctionalType_Extension)

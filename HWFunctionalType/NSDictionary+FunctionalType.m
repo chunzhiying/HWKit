@@ -23,13 +23,16 @@
     };
 }
 
-- (id (^)(flatMapType))flatMap {
+- (NSArray *(^)(flatMapType))flatMap {
     return ^(flatMapType block) {
-        id result;
+        id result = [NSMutableArray new];
         for (id key in self.allKeys) {
+            if (!self[key] || [self[key] isKindOfClass:[NSNull class]]) {
+                continue;
+            }
             id newElement = block(@{@"key":key, @"value":self[key]});
             if (newElement) {
-                result = newElement;
+                [result addObject:newElement];
             }
         }
         return result;

@@ -55,6 +55,19 @@ __strong __typeof(weakSelf) strongSelf = weakSelf;
 
 @end
 
+
+@implementation HWAlertContainerController
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+}
+
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+@end
+
 @interface UIAlertController (Window)
 
 @property (nonatomic, strong) UIWindow *alertWindow;
@@ -75,13 +88,9 @@ __strong __typeof(weakSelf) strongSelf = weakSelf;
     return objc_getAssociatedObject(self, @selector(alertWindow));
 }
 
-- (BOOL)shouldAutorotate {
-    return NO;
-}
-
 - (void)show {
     self.alertWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.alertWindow.rootViewController = [UIViewController new];
+    self.alertWindow.rootViewController = [HWAlertContainerController new];
     
     self.alertWindow.tintColor = [UIApplication sharedApplication].delegate.window.tintColor;
     
@@ -126,15 +135,19 @@ __strong __typeof(weakSelf) strongSelf = weakSelf;
     }
 }
 
-
 - (void)paserLabelText:(UILabel *)label {
     
     if (!(label.text.length != 0 && HasButtonId(label.text))) {
         return;
     }
     
+    if (self.preferredStyle == UIAlertControllerStyleAlert) {
+        label.font = [UIFont systemFontOfSize:17];
+    } else {
+        label.font = [UIFont systemFontOfSize:20];
+    }
+    
     NSString *realText = ClearButtonId(label.text);
-    label.font = [UIFont systemFontOfSize:20];
     label.text = realText;
     
     if (realText.length != [self checkStyle:Symbol_Red withTitle:realText].length) {

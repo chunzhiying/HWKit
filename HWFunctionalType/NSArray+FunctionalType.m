@@ -129,6 +129,32 @@
     };
 }
 
+- (NSArray *(^)(NSUInteger count))just {
+    return ^(NSUInteger count) {
+        if (count > self.count) {
+            return self;
+        }
+        NSMutableArray *result = [NSMutableArray new];
+        for (NSInteger i = 0; i < count; i++) {
+            [result addObject:[self objectAtIndex:i]];
+        }
+        return (NSArray *)result;
+    };
+}
+
+- (NSArray *(^)(NSUInteger count))justTail {
+    return ^(NSUInteger count) {
+        if (count > self.count) {
+            return self;
+        }
+        NSMutableArray *result = [NSMutableArray new];
+        for (NSInteger i = self.count - count; i < self.count; i++) {
+            [result addObject:[self objectAtIndex:i]];
+        }
+        return (NSArray *)result;
+    };
+}
+
 @end
 
 @implementation NSArray (FunctionalType_Extension)

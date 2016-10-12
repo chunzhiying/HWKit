@@ -8,13 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+@class HWPromiseResult;
+
 typedef void(^thenType)(id obj);
-typedef void(^alwaysType)(BOOL result, id obj);
+typedef void(^alwaysType)(HWPromiseResult *result);
+typedef void(^completeType)(NSArray<HWPromiseResult *> *results);
 
-@interface HWPromise : NSObject
+@interface HWPromise<__covariant SuccessT, __covariant FailT> : NSObject
 
-@property (nonatomic, strong) id successObj;
-@property (nonatomic, strong) id failObj;
+@property (nonatomic, strong) SuccessT successObj;
+@property (nonatomic, strong) FailT failObj;
 
 @end
 
@@ -23,5 +26,20 @@ typedef void(^alwaysType)(BOOL result, id obj);
 @property (nonatomic, readonly) HWPromise *(^success)(thenType);
 @property (nonatomic, readonly) HWPromise *(^fail)(thenType);
 @property (nonatomic, readonly) HWPromise *(^always)(alwaysType);
+@property (nonatomic, readonly) HWPromise *(^complete)(completeType);
+
+@end
+
+@interface HWPromiseResult : NSObject
+
+@property (nonatomic) BOOL status;
+@property (nonatomic, strong) id object; // SuccessT || FailT
+
+@end
+
+
+@interface NSArray (Promise_Extension) //callback hell, use complete.
+
+@property (nonatomic, readonly) HWPromise *promise;
 
 @end
