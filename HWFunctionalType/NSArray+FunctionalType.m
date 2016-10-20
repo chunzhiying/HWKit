@@ -155,6 +155,24 @@
     };
 }
 
+- (NSArray *(^)(forEachType))forEach {
+    return ^(forEachType block) {
+        for (id obj in self) {
+            block(obj);
+        }
+        return self;
+    };
+}
+
+- (NSArray *(^)(forEachWithIndexType))forEachWithIndex {
+    return ^(forEachWithIndexType block) {
+        for (NSInteger i = 0; i < self.count; i++) {
+            block([self objectAtIndex:i], i);
+        }
+        return self;
+    };
+}
+
 @end
 
 @implementation NSArray (FunctionalType_Extension)
@@ -169,30 +187,3 @@
 
 @end
 
-@implementation NSArray (FunctionalTypeExample)
-
-- (void)example {
-    
-    NSArray *a = @[@[@2, @3], @4, @1, @9, @5];
-    
-    NSArray *result = a.flatMap(^(id obj) {
-        return @([obj intValue] * 3);
-    }).sort(^(id obj1, id obj2) {
-        return obj1 > obj2 ? NSOrderedAscending : NSOrderedDescending;
-    }).filter(^(id obj) {
-        return [NSNumber numberWithBool:[obj intValue] > 5];
-    });
-    
-    id resultTotal = result.reduce(@0, ^(NSNumber *result, NSNumber *element) {
-        result = @([result intValue] + [element intValue]);
-        return result;
-    });
-    
-    for (NSNumber *element in result) {
-        NSLog(@"element:%@", element);
-    }
-    
-    NSLog(@"resultTotal:%@", resultTotal);
-}
-
-@end

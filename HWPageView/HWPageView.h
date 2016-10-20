@@ -15,7 +15,7 @@
 @required
 - (NSInteger)numberOfPages;
 
-- (NSString *)pageView:(HWPageView *)pageView titleAtIndex:(NSInteger)index;
+- (NSString *)pageView:(HWPageView *)pageView titleAtIndex:(NSInteger)index; //support NSAttributedString
 - (UIView *)  pageView:(HWPageView *)pageView viewAtIndex:(NSInteger)index;
 
 @end
@@ -23,8 +23,9 @@
 @protocol HWPageViewDelegate <NSObject>
 
 @optional
-- (CGFloat)heightForTab;
-- (UIColor *)colorForTabBg;
+- (CGFloat)heightForTabInPageView:(HWPageView *)pageView; //default: 36
+- (UIColor *)colorForTabBgInPageView:(HWPageView *)pageView; //default: [UIColor whiteColor]
+- (CGFloat)paddingForSelectedLineInPageView:(HWPageView *)pageView; //default: 10
 
 - (void)pageview:(HWPageView *)pageView didChangeTabFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
 

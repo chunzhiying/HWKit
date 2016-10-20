@@ -76,15 +76,21 @@
         _label.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _label.font = [UIFont systemFontOfSize:15];
         _label.textAlignment = NSTextAlignmentCenter;
-        _label.text = title;
         _label.textColor = normalColor;
         
         _highlightLabel = [[UILabel alloc] initWithFrame:self.bounds];
         _highlightLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _highlightLabel.font = [UIFont systemFontOfSize:15];
         _highlightLabel.textAlignment = NSTextAlignmentCenter;
-        _highlightLabel.text = title;
         _highlightLabel.textColor = highlightColor;
+        
+        if ([title isKindOfClass:[NSAttributedString class]]) {
+            _label.attributedText = (NSAttributedString *)title;
+            _highlightLabel.attributedText = (NSAttributedString *)title;
+        } else {
+            _label.text = title;
+            _highlightLabel.text = title;
+        }
         
         _dot = [CAShapeLayer layer];
         _dot.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, defaultItemDotDiameter, defaultItemDotDiameter)].CGPath;
@@ -156,6 +162,7 @@
     CGFloat _tabScrollHeight;
     CGFloat _tabItemWidth;
     
+    CGFloat _selectLinePadding;
     CGFloat _selectedLineDiffX;
     CGFloat _selectedTempX;
     
@@ -182,8 +189,8 @@
         _delegate = delegate;
         
         _tabScrollHeight = defaultTabScrollHeight;
-        if (_delegate && [_delegate respondsToSelector:@selector(heightForTab)]) {
-            _tabScrollHeight = [_delegate heightForTab];
+        if (_delegate && [_delegate respondsToSelector:@selector(heightForTabInPageView:)]) {
+            _tabScrollHeight = [_delegate heightForTabInPageView:self];
         }
 
         _tabAry = [NSMutableArray new];
@@ -243,8 +250,13 @@
     _selectedLine.backgroundColor = _tabTitleHighlightColor;
     _selectedLine.hidden = _selectedType != HWPageSelectedType_Line;
     
-    _selectedLineDiffX = defaultSelectLineMask;
-    _selectedTempX = defaultSelectLineMask;
+    _selectLinePadding = defaultSelectLineMask;
+    if (_delegate && [_delegate respondsToSelector:@selector(paddingForSelectedLineInPageView:)]) {
+        _selectLinePadding = [_delegate paddingForSelectedLineInPageView:self];
+    }
+    
+    _selectedLineDiffX = _selectLinePadding;
+    _selectedTempX = _selectLinePadding;
     
     [self addSubview:_selectedLine];
     [self resetSeletedLineFrame];
@@ -259,8 +271,8 @@
     _tabScroll = [[UIScrollView alloc] initWithFrame:CGRectZero];
     
     UIColor *tabBgColor = defaultTabScrollBgColor;
-    if (_delegate && [_delegate respondsToSelector:@selector(colorForTabBg)]) {
-        tabBgColor = [_delegate colorForTabBg];
+    if (_delegate && [_delegate respondsToSelector:@selector(colorForTabBgInPageView:)]) {
+        tabBgColor = [_delegate colorForTabBgInPageView:self];
     }
     
     for (NSInteger index = 0; index < [_dataSource numberOfPages]; index++) {
@@ -359,10 +371,10 @@
     
     if (_isTabScrollCanRoll) {
         [_tabScroll scrollRectToVisible:CGRectMake(_tabItemWidth * visibleItemIndex, 0, _tabItemWidth, _tabScrollHeight) animated:YES];
-        [_selectedLine setX:selectedIndex * _tabItemWidth + defaultSelectLineMask - _tabScroll.contentOffset.x];
+        [_selectedLine setX:selectedIndex * _tabItemWidth + _selectLinePadding - _tabScroll.contentOffset.x];
     }
     else {
-        [_selectedLine setX:selectedIndex * _tabItemWidth + defaultSelectLineMask];
+        [_selectedLine setX:selectedIndex * _tabItemWidth + _selectLinePadding];
     }
     
     _selectedPage = [_pageAry objectAtIndex:selectedIndex];
@@ -390,14 +402,14 @@
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (scrollView == _pageScroll) {
         [_selectedLine setX:_selectedLineDiffX + scrollView.contentOffset.x * _tabItemWidth / WidthOf(_pageScroll)];
-        _selectedTempX = scrollView.contentOffset.x * _tabItemWidth / WidthOf(_pageScroll) + defaultSelectLineMask;
+        _selectedTempX = scrollView.contentOffset.x * _tabItemWidth / WidthOf(_pageScroll) + _selectLinePadding;
 
         [self handleGradualChangeWithContentOffset:scrollView.contentOffset];
     }
     
     if (scrollView == _tabScroll) {
         [_selectedLine setX:_selectedTempX - scrollView.contentOffset.x];
-        _selectedLineDiffX = defaultSelectLineMask - scrollView.contentOffset.x;
+        _selectedLineDiffX = _selectLinePadding - scrollView.contentOffset.x;
     }
 }
 
@@ -440,7 +452,7 @@
 
 - (void)resetSeletedLineFrame
 {
-    _selectedLine.frame = CGRectMake(defaultSelectLineMask, _tabScrollHeight - 2, _tabItemWidth - 2 * defaultSelectLineMask, 2);
+    _selectedLine.frame = CGRectMake(_selectLinePadding, _tabScrollHeight - 2, _tabItemWidth - 2 * _selectLinePadding, 2);
 }
 
 - (void)resetPageScrollFrame:(CGRect)frame

@@ -13,11 +13,14 @@
 #define Implementation(class, method) @implementation class (FunctionalType_Basic)  method  @end
 
 typedef void(^thenType)(id obj);
+typedef void(^forEachType)(id obj);
+typedef void(^forEachWithIndexType)(id obj, NSUInteger index);
 
 typedef id(^mapType)(id element);
 typedef id(^mapWithIndexType)(id element, NSUInteger index);
 typedef id(^flatMapType)(id element);
 typedef id(^reduceType)(id result, id element);
+
 typedef NSNumber *(^compareType)(id obj1, id obj2); //bool
 typedef NSNumber *(^filterType)(id obj1); //bool
 typedef NSComparisonResult(^sortType)(id obj1, id obj2);
@@ -30,6 +33,7 @@ typedef NSComparisonResult(^sortType)(id obj1, id obj2);
 @property (nonatomic, readonly) id<HWFunctionalType>(^map)(mapType);
 @property (nonatomic, readonly) id<HWFunctionalType>(^mapWithIndex)(mapWithIndexType);
 @property (nonatomic, readonly) id<HWFunctionalType>(^flatMap)(flatMapType);
+
 @property (nonatomic, readonly) id<HWFunctionalType>(^sort)(sortType);
 @property (nonatomic, readonly) id<HWFunctionalType>(^filter)(filterType);
 @property (nonatomic, readonly) id(^reduce)(id, reduceType);
@@ -37,6 +41,9 @@ typedef NSComparisonResult(^sortType)(id obj1, id obj2);
 
 @property (nonatomic, readonly) id<HWFunctionalType>(^just)(NSUInteger count);
 @property (nonatomic, readonly) id<HWFunctionalType>(^justTail)(NSUInteger count);
+
+@property (nonatomic, readonly) id<HWFunctionalType>(^forEach)(forEachType);
+@property (nonatomic, readonly) id<HWFunctionalType>(^forEachWithIndex)(forEachWithIndexType);
 
 @end
 

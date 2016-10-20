@@ -23,6 +23,9 @@
 @property (nonatomic, readonly) NSArray *(^just)(NSUInteger count);
 @property (nonatomic, readonly) NSArray *(^justTail)(NSUInteger count);
 
+@property (nonatomic, readonly) NSArray *(^forEach)(forEachType);
+@property (nonatomic, readonly) NSArray *(^forEachWithIndex)(forEachWithIndexType);
+
 @end
 
 @interface NSArray (FunctionalType_Extension)

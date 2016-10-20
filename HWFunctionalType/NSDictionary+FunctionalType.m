@@ -63,19 +63,3 @@
 
 @end
 
-@implementation NSDictionary (FunctionalTypeExample)
-
-- (void)example {
-
-    NSDictionary *dicResult = @{@"a":@1, @"b":@2, @"c":@3}.map(^(NSDictionary *dic) {
-        return @([dic[@"value"] intValue] * 5);
-    }).filter(^(NSDictionary *dic) {
-        return [NSNumber numberWithBool:[dic[@"value"] intValue] > 5];
-    });
-    
-    NSLog(@"dic:%@", dicResult);
-    
-}
-
-@end
-
