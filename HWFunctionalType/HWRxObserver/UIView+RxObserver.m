@@ -11,22 +11,15 @@
 #import "NSArray+FunctionalType.h"
 #import <objc/runtime.h>
 
-@interface UIView (RxObserver_Base)
-
-@property (nonatomic, strong) NSMutableArray<HWRxObserver *> *observers;
-
-@end
-
 @implementation UIView (RxObserver_Base)
 
-- (void)addObserver:(HWRxObserver *)observer {
+- (void)addRxObserver:(HWRxObserver *)observer {
     if ([observer.keyPath isEqualToString:@"tap"]) {
         [self addGestureObserver:observer];
+        [self.observers addObject:observer];
     } else {
-        [self addObserver:observer forKeyPath:observer.keyPath
-                  options:NSKeyValueObservingOptionNew context:NULL];
+        [super addRxObserver:observer];
     }
-    [self.observers addObject:observer];
 }
 
 - (void)addGestureObserver:(HWRxObserver *)observer {
@@ -38,19 +31,6 @@
     }
 }
 
-#pragma mark - Observers
-- (void)setObservers:(NSMutableArray<HWRxObserver *> *)observers {
-    objc_setAssociatedObject(self, @selector(observers), observers, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (NSMutableArray<HWRxObserver *> *)observers {
-    if (objc_getAssociatedObject(self, @selector(observers)) == nil) {
-        NSMutableArray *array = [NSMutableArray new];
-        self.observers = array;
-        return array;
-    }
-     return objc_getAssociatedObject(self, @selector(observers));
-}
 
 #pragma mark - Method Swizzling
 + (void)load {
@@ -60,13 +40,13 @@
 }
 
 - (void)RxObserver_removeFromSuperview {
-    self.observers
-    .filter(^(HWRxObserver *observer) {
-        return @(![observer.keyPath isEqualToString:@"tap"]);
-    })
-    .forEach(^(HWRxObserver *observer) {
-        [self removeObserver:observer forKeyPath:observer.keyPath];
-    });
+    if (self.observers.count != 0) {
+        self.observers = (NSMutableArray *)self.observers
+        .filter(^(HWRxObserver *observer) {
+            return @(![observer.keyPath isEqualToString:@"tap"]);
+        });
+        [self removeAllRxObserver];
+    }
     [self RxObserver_removeFromSuperview];
 }
 
@@ -75,31 +55,24 @@
 
 @implementation UIView (RxObserver)
 
-- (HWRxObserver *)Rx_tap {
-    return [HWRxObserver new].then(^(HWRxObserver *observer) {
-        observer.keyPath = @"tap";
-        [self addObserver:observer];
-    });
-}
-
-- (HWRxObserver *(^)(NSString *))Rx {
-    return ^(NSString *keyPath) {
-        return [HWRxObserver new].then(^(HWRxObserver *observer) {
-            observer.keyPath = keyPath;
-            [self addObserver:observer];
-        });
-    };
+- (HWRxObserver *)rx_tap {
+    return self.Rx(@"tap");
 }
 
 @end
 
 @implementation UILabel (RxObserver)
 
-- (HWRxObserver *)Rx_text {
-    return [HWRxObserver new].then(^(HWRxObserver *observer) {
-        observer.keyPath = @"text";
-        [self addObserver:observer];
-    });
+- (HWRxObserver *)rx_text {
+    return self.Rx(@"text");
+}
+
+@end
+
+@implementation UITextField (RxObserver)
+
+- (HWRxObserver *)rx_text {
+    return self.Rx(@"text");
 }
 
 @end

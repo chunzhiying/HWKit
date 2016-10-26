@@ -7,18 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "HWRxObserver.h"
+#import "NSObject+RxObserver.h"
 
 @interface UIView (RxObserver)
 
-@property (nonatomic, readonly) HWRxObserver *Rx_tap;
-@property (nonatomic, readonly) HWRxObserver *(^Rx)(NSString *keyPath);
+@property (nonatomic, readonly) HWRxObserver *rx_tap;
 
 @end
 
 @interface UILabel (RxObserver)
 
-@property (nonatomic, readonly) HWRxObserver *Rx_text;
+@property (nonatomic, readonly) HWRxObserver *rx_text;
+
+@end
+
+@interface UITextField (RxObserver)
+
+@property (nonatomic, readonly) HWRxObserver *rx_text;
 
 @end
 
