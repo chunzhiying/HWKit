@@ -195,9 +195,8 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     return ^(filterType block) {
         HWRxObserver *observer = [HWRxObserver new];
         self.subscribe(^(id obj) {
-            id data = block(obj);
-            if ([data boolValue]) {
-                observer.rxObj = data;
+            if ([block(obj) boolValue]) {
+                observer.rxObj = obj;
             }
         });
         return observer;
@@ -223,7 +222,7 @@ if(atBlock) { atBlock(__VA_ARGS__); }
         __block id lastObj = nil;
         self.subscribe(^(id obj) {
             if ((![obj isKindOfClass:[lastObj class]])
-                ||([obj isKindOfClass:[NSNumber class]] && ![obj isEqualToValue:lastObj])
+                ||([obj isKindOfClass:[NSValue class]] && ![obj isEqualToValue:lastObj])
                 ||([obj isKindOfClass:[NSString class]] && ![obj isEqualToString:lastObj]))
             {
                 lastObj = obj;
