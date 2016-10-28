@@ -29,11 +29,13 @@ typedef enum : NSUInteger {
 
 @interface HWGradualChangeHeaderView : UIView
 
-@property (nonatomic) HWGCDownType downType; //default: Scale
-@property (nonatomic) HWGCUpType upType;     //default: Alpha
+@property (nonatomic) HWGCDownType downType; //default: Move
+@property (nonatomic) HWGCUpType upType;     //default: Move
 
 - (instancetype)initWithFrame:(CGRect)frame
                          main:(UIView *)main another:(UIView *)another
                          link:(UIView<HWScrollable> *)link;
+
+- (void)resetMainViewHeight:(CGFloat)newHeight;
 
 @end
