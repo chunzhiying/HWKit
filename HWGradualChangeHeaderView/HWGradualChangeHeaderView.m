@@ -32,31 +32,37 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.clipsToBounds = YES;
-        _mainView = main;
-        _anotherView = another;
         _linkView = link;
-        _downType = HWGCDown_Move;
-        _upType = HWGCUp_Move;
-        [self initView];
+        self.clipsToBounds = YES;
+        [self initWithMain:main another:another];
         [self bindData];
     }
     return self;
 }
 
-- (void)initView {
+- (void)initWithMain:(UIView *)main another:(UIView *)another {
+    _downType = HWGCDown_Move;
+    _upType = HWGCUp_Move;
+    
     _originalY = self.y;
-    _maxHeight = _mainView.bounds.size.height;
-    _minHeight = _anotherView.bounds.size.height;
+    _maxHeight = main.bounds.size.height;
+    _minHeight = another.bounds.size.height;
     _linkViewOriginalHeight = _linkView.bounds.size.height;
     
+    _mainView = [[UIView alloc] initWithFrame:main.bounds];
     _mainView.layer.anchorPoint = CGPointMake(0.5, 0);
-    _mainView.frame = _mainView.bounds;
-    _anotherView.frame = _anotherView.bounds;
+    _anotherView = [[UIView alloc] initWithFrame:another.bounds];
     _anotherView.alpha = 0;
     
-    [self addSubview:_mainView];
-    [self addSubview:_anotherView];
+    [self addSubview:_mainView.then(^(UIView *containerView) {
+        main.frame = CGRectMake(0, 0, main.width, main.height);
+        [containerView addSubview:main];
+    })];
+    
+    [self addSubview:_anotherView.then(^(UIView *containerView) {
+        another.frame = CGRectMake(0, 0, another.width, another.height);
+        [containerView addSubview:another];
+    })];
 }
 
 - (void)resetMainViewHeight:(CGFloat)newHeight {
@@ -141,20 +147,21 @@
         {
             CGFloat scale = self.height * 1.0 / _maxHeight;
             _mainView.transform = CGAffineTransformMakeScale(scale * scale, scale * scale);
+            _mainView.layer.position = CGPointMake(self.width / 2, 0);
             break;
         }
         case HWGCDown_Move:
-            _mainView.layer.position = CGPointMake(_mainView.width / 2, -offsetY);
+            _mainView.layer.position = CGPointMake(self.width / 2, -offsetY);
             break;
     }
+    _linkView.frame = CGRectMake(_linkView.x, _maxHeight + _originalY, _linkView.width, _linkViewOriginalHeight);
     _mainView.alpha = 1;
 }
 
 - (void)executeUpAnimation {
-    
     switch (_upType) {
         case HWGCUp_Move:
-            _mainView.frame = CGRectMake(_mainView.x, self.height - _maxHeight, _mainView.width, _maxHeight);
+            _mainView.layer.position = CGPointMake(self.width / 2, self.height - _maxHeight);
             break;
             
         case HWGCUp_Alpha:
@@ -164,6 +171,7 @@
         case HWGCUp_Static:
             break;
     }
+    _mainView.transform = CGAffineTransformMakeScale(1, 1);
 }
 
 @end
