@@ -39,3 +39,8 @@ typedef enum : NSUInteger {
 - (void)resetMainViewHeight:(CGFloat)newHeight;
 
 @end
+
+
+@interface UIScrollView (HWScrollable_Extension) <HWScrollable>
+
+@end
