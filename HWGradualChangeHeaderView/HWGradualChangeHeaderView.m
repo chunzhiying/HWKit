@@ -9,6 +9,7 @@
 #import "HWGradualChangeHeaderView.h"
 #import "UIView+RxObserver.h"
 #import "HWHelper.h"
+#import "NSArray+FunctionalType.h"
 
 @interface HWGradualChangeHeaderView ()
 {
@@ -71,12 +72,17 @@
     }
     CGFloat oldHeight = _maxHeight;
     _maxHeight = MAX(newHeight, _minHeight);
+    _linkViewOriginalHeight -= newHeight - oldHeight;
+    
     _mainView.height = newHeight;
+    _mainView.subviews.forEach(^(UIView *view) {
+        view.height = newHeight;
+    });
     
     if (newHeight > oldHeight) {
         self.height += newHeight - oldHeight;
     } else {
-        self.height = MAX(self.height - (oldHeight - newHeight), _minHeight);
+        self.height = _maxHeight;
     }
 }
 
