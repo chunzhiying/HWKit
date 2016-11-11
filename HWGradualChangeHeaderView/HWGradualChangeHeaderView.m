@@ -108,6 +108,7 @@
     })
     .map(^(NSValue *frameValue) {
         CGFloat height = [frameValue CGRectValue].size.height;
+        _linkView.contentOffset = CGPointMake(0, 0);
         return [NSValue valueWithCGRect:CGRectMake(self.linkView.x, height + _originalY,
                                                    self.linkView.width,
                                                    _linkViewOriginalHeight + (_maxHeight - height))];
@@ -126,22 +127,25 @@
         
         self.y = _originalY;
         
-        if (offsetY == 0) {
-            return;
+        if (currentHeight < _maxHeight && currentHeight > _minHeight) {
+            if (offsetY == 0) {
+                return;
+            } else {
+                changeY = offsetY > 5 ? 5 : changeY; //limit when contentOffset unusual changing.
+            }
         }
         
-        if (offsetY < 0 && currentHeight >= _maxHeight) {
+        if (offsetY <= 0 && currentHeight >= _maxHeight) {
             [self executeDownAnimationWithOffsetY:offsetY];
             self.height = _maxHeight - offsetY;
             return;
         }
         
-        if ((offsetY > 0 && currentHeight <= _minHeight)) {
+        if ((offsetY >= 0 && currentHeight <= _minHeight)) {
             self.height = _minHeight;
             return;
         }
         
-        _linkView.contentOffset = CGPointMake(0, 0);
         self.height = currentHeight - changeY;
     });
 }
