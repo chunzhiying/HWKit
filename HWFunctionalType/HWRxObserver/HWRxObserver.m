@@ -28,7 +28,9 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     NSMutableArray<nextType> *_nextBlockAry;
     
     BOOL _debounceEnable;
+    BOOL _throttleEnable;
     CGFloat _debounceValue;
+    CGFloat _throttleValue;
 }
 
 @property (nonatomic, strong) NSObject *rxObj;
@@ -43,8 +45,10 @@ if(atBlock) { atBlock(__VA_ARGS__); }
         self.tapAction = @selector(onTap);
         _nextBlockAry = [NSMutableArray new];
         _debounceEnable = YES;
+        _throttleEnable = YES;
         _connect = YES;
         _debounceValue = 0;
+        _throttleValue = 0;
     }
     return self;
 }
@@ -64,18 +68,31 @@ if(atBlock) { atBlock(__VA_ARGS__); }
 }
 
 - (void)setRxObj:(NSObject *)rxObj {
-    if (!(_debounceEnable && _connect)) {
+    
+    if (!(_debounceEnable && _throttleEnable && _connect)) {
         return;
     }
-    [self postAllWith:rxObj];
     
     _debounceEnable = _debounceValue == 0;
+    _throttleEnable = _throttleValue == 0;
+    
     if (_debounceValue > 0) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_debounceValue * NSEC_PER_SEC)),
                        dispatch_get_main_queue(), ^{
                            _debounceEnable = YES;
                        });
     }
+    
+    if (_throttleValue > 0) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_throttleValue * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
+                           _throttleEnable = YES;
+                           [self postAllWith:_latestData];
+                       });
+        return;
+    }
+    
+    [self postAllWith:rxObj];
 }
 
 #pragma mark - Post
@@ -90,6 +107,25 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     _nextBlockAry.forEach(^(nextType block) {
         [self postTo:block with:data];
     });
+}
+
+#pragma mark - Register
+- (void)registerObserver:(NSObject *)object {
+    if ([object isKindOfClass:[NSNotificationCenter class]]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onNofication:)
+                                                     name:self.keyPath object:nil];
+    } else {
+        [object addObserver:self forKeyPath:self.keyPath
+                  options:NSKeyValueObservingOptionNew context:NULL];
+    }
+}
+
+#pragma mark - Notification
+- (void)onNofication:(NSNotification *)notification
+{
+    NSDictionary *userInfo = notification.userInfo ? notification.userInfo : [NSDictionary new];
+    _latestData = userInfo;
+    self.rxObj = userInfo;
 }
 
 #pragma mark - KVO
@@ -118,6 +154,13 @@ if(atBlock) { atBlock(__VA_ARGS__); }
 - (HWRxObserver *(^)(CGFloat))debounce {
     return ^(CGFloat value) {
         _debounceValue = value;
+        return self;
+    };
+}
+
+- (HWRxObserver *(^)(CGFloat))throttle {
+    return ^(CGFloat value) {
+        _throttleValue = value;
         return self;
     };
 }

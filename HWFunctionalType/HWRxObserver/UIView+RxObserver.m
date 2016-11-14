@@ -16,7 +16,7 @@
 - (void)addRxObserver:(HWRxObserver *)observer {
     if ([observer.keyPath isEqualToString:@"tap"]) {
         [self addGestureObserver:observer];
-        [self.observers addObject:observer];
+        [self.rx_observers addObject:observer];
     } else {
         [super addRxObserver:observer];
     }
@@ -40,12 +40,13 @@
 }
 
 - (void)RxObserver_removeFromSuperview {
-    if (self.observers.count != 0) {
-        self.observers = (NSMutableArray *)self.observers
+    if (self.rx_observers.count != 0) {
+        self.rx_observers = (NSMutableArray *)self.rx_observers
         .filter(^(HWRxObserver *observer) {
             return @(![observer.keyPath isEqualToString:@"tap"]);
         });
         [self removeAllRxObserver];
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
     }
     [self RxObserver_removeFromSuperview];
 }
@@ -72,7 +73,13 @@
 @implementation UITextField (RxObserver)
 
 - (HWRxObserver *)rx_text {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFiledEditChanged:)
+                                                 name:UITextFieldTextDidChangeNotification object:self];
     return self.Rx(@"text");
+}
+
+- (void)textFiledEditChanged:(NSNotification *)notification {
+    self.text = self.text;
 }
 
 @end

@@ -23,6 +23,8 @@ typedef void(^nextType)(id obj);
 
 - (instancetype)initWithBaseData:(id)data;
 
+- (void)registerObserver:(NSObject *)object;
+
 @end
 
 
@@ -32,7 +34,8 @@ typedef void(^nextType)(id obj);
 @property (nonatomic, readonly) HWRxObserver *(^bindTo)(id object, NSString *keyPath);
 @property (nonatomic, readonly) HWRxObserver *(^disposeBy)(NSObject *);
 
-@property (nonatomic, readonly) HWRxObserver *(^debounce)(CGFloat value);
+@property (nonatomic, readonly) HWRxObserver *(^debounce)(CGFloat value); // received, then wait value seconds.
+@property (nonatomic, readonly) HWRxObserver *(^throttle)(CGFloat value); // after value seconds, then received.
 @property (nonatomic, readonly) HWRxObserver *(^startWith)(id object);
 
 @property (nonatomic, readonly) HWRxObserver *(^behavior)(); // receive data when connect()

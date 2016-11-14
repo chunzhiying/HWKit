@@ -11,7 +11,7 @@
 
 @interface NSObject (RxObserver_Base)
 
-@property (nonatomic, strong) NSMutableArray<HWRxObserver *> *observers;
+@property (nonatomic, strong) NSMutableArray<HWRxObserver *> *rx_observers;
 
 - (void)addRxObserver:(HWRxObserver *)observer;
 - (void)removeRxObserver:(HWRxObserver *)observer;

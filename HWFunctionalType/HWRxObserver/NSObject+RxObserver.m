@@ -13,25 +13,24 @@
 @implementation NSObject (RxObserver_Base)
 
 - (void)addRxObserver:(HWRxObserver *)observer {
-    [self addObserver:observer forKeyPath:observer.keyPath
-              options:NSKeyValueObservingOptionNew context:NULL];
-    [self.observers addObject:observer];
+    [observer registerObserver:self];
+    [self.rx_observers addObject:observer];
 }
 
 - (void)removeRxObserver:(HWRxObserver *)observer {
     [self removeObserver:observer forKeyPath:observer.keyPath];
-    [self.observers removeObject:observer];
+    [self.rx_observers removeObject:observer];
 }
 
 - (void)removeAllRxObserver {
-    self.observers.forEach(^(HWRxObserver *observer) {
+    self.rx_observers.forEach(^(HWRxObserver *observer) {
         [self removeObserver:observer forKeyPath:observer.keyPath];
     });
-    [self.observers removeAllObjects];
+    [self.rx_observers removeAllObjects];
 }
 
 - (void)executeDisposalBy:(NSObject *)disposer {
-    self.observers.filter(^(HWRxObserver *observer) {
+    self.rx_observers.filter(^(HWRxObserver *observer) {
         return @([observer.disposer isEqualToString:[NSString stringWithFormat:@"%p", disposer]]);
     }).forEach(^(HWRxObserver *observer) {
         [self removeRxObserver:observer];
@@ -39,17 +38,17 @@
 }
 
 #pragma mark - Observers
-- (void)setObservers:(NSMutableArray<HWRxObserver *> *)observers {
-    objc_setAssociatedObject(self, @selector(observers), observers, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+- (void)setRx_observers:(NSMutableArray<HWRxObserver *> *)observers {
+    objc_setAssociatedObject(self, @selector(rx_observers), observers, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (NSMutableArray<HWRxObserver *> *)observers {
-    if (objc_getAssociatedObject(self, @selector(observers)) == nil) {
+- (NSMutableArray<HWRxObserver *> *)rx_observers {
+    if (objc_getAssociatedObject(self, @selector(rx_observers)) == nil) {
         NSMutableArray *array = [NSMutableArray new];
-        self.observers = array;
+        self.rx_observers = array;
         return array;
     }
-    return objc_getAssociatedObject(self, @selector(observers));
+    return objc_getAssociatedObject(self, @selector(rx_observers));
 }
 
 @end
