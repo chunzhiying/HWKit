@@ -13,20 +13,23 @@
 @implementation NSObject (RxObserver_Base)
 
 - (void)addRxObserver:(HWRxObserver *)observer {
-    [observer registerObserver:self];
+    [observer registeredToObserve:self];
     [self.rx_observers addObject:observer];
 }
 
 - (void)removeRxObserver:(HWRxObserver *)observer {
-    [self removeObserver:observer forKeyPath:observer.keyPath];
+    if (class_getProperty([self class], [observer.keyPath cStringUsingEncoding:NSASCIIStringEncoding])) {
+        [self removeObserver:observer forKeyPath:observer.keyPath];
+    }
     [self.rx_observers removeObject:observer];
 }
 
 - (void)removeAllRxObserver {
-    self.rx_observers.forEach(^(HWRxObserver *observer) {
-        [self removeObserver:observer forKeyPath:observer.keyPath];
+    self.rx_observers.map(^(HWRxObserver *observer) {
+        return observer;
+    }).forEach(^(HWRxObserver *observer) {
+        [self removeRxObserver:observer];
     });
-    [self.rx_observers removeAllObjects];
 }
 
 - (void)executeDisposalBy:(NSObject *)disposer {
@@ -43,11 +46,6 @@
 }
 
 - (NSMutableArray<HWRxObserver *> *)rx_observers {
-    if (objc_getAssociatedObject(self, @selector(rx_observers)) == nil) {
-        NSMutableArray *array = [NSMutableArray new];
-        self.rx_observers = array;
-        return array;
-    }
     return objc_getAssociatedObject(self, @selector(rx_observers));
 }
 
@@ -57,11 +55,21 @@
 
 - (HWRxObserver *(^)(NSString *))Rx {
     return ^(NSString *keyPath) {
-        return [[HWRxObserver alloc] initWithBaseData:[self valueForKey:keyPath]]
-        .then(^(HWRxObserver *observer) {
+        if (!self.rx_observers) {
+            self.rx_observers = [NSMutableArray new];
+        }
+        return [HWRxObserver new].then(^(HWRxObserver *observer) {
+            observer.target = self;
             observer.keyPath = keyPath;
             [self addRxObserver:observer];
         });
+    };
+}
+
+- (void (^)(NSString *))rx_repost {
+    return ^(NSString *keyPath) {
+        [self willChangeValueForKey:keyPath];
+        [self didChangeValueForKey:keyPath];
     };
 }
 

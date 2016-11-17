@@ -12,18 +12,18 @@
 
 @class HWRxObserver;
 
+typedef void(^nextBlankType)();
 typedef void(^nextType)(id obj);
 
 
 @interface HWRxObserver : NSObject <HWFunctionalType>
 
+@property (nonatomic, weak) NSObject *target;
 @property (nonatomic, strong) NSString *disposer;
 @property (nonatomic, strong) NSString *keyPath;
 @property (nonatomic, assign) SEL tapAction;
 
-- (instancetype)initWithBaseData:(id)data;
-
-- (void)registerObserver:(NSObject *)object;
+- (void)registeredToObserve:(NSObject *)object;
 
 @end
 
@@ -31,6 +31,8 @@ typedef void(^nextType)(id obj);
 @interface HWRxObserver (Base_Extension)
 
 @property (nonatomic, readonly) HWRxObserver *(^subscribe)(nextType);
+@property (nonatomic, readonly) HWRxObserver *(^response)(nextBlankType);
+
 @property (nonatomic, readonly) HWRxObserver *(^bindTo)(id object, NSString *keyPath);
 @property (nonatomic, readonly) HWRxObserver *(^disposeBy)(NSObject *);
 
@@ -41,6 +43,8 @@ typedef void(^nextType)(id obj);
 @property (nonatomic, readonly) HWRxObserver *(^behavior)(); // receive data when connect()
 @property (nonatomic, readonly) HWRxObserver *(^connect)();
 @property (nonatomic, readonly) HWRxObserver *(^disconnect)();
+
+@property (nonatomic, readonly) HWRxObserver *(^takeUntil)(HWRxObserver *);
 
 @end
 

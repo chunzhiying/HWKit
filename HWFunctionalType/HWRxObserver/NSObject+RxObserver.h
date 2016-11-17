@@ -23,5 +23,6 @@
 @interface NSObject (RxObserver)
 
 @property (nonatomic, readonly) HWRxObserver *(^Rx)(NSString *keyPath);
+@property (nonatomic, readonly) void(^rx_repost)(NSString *keyPath); //repost with lastest data, prepare for property without KVC
 
 @end

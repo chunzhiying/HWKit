@@ -15,15 +15,16 @@
 
 @end
 
-@interface UILabel (RxObserver)
+@interface UITextField (RxObserver)
 
 @property (nonatomic, readonly) HWRxObserver *rx_text;
 
 @end
 
-@interface UITextField (RxObserver)
 
-@property (nonatomic, readonly) HWRxObserver *rx_text;
+@interface UIResponder (RxObserver_dealloc)
+
+@property (nonatomic, readonly) HWRxObserver *rx_dealloc;
 
 @end
 

@@ -14,7 +14,7 @@
 @implementation UIView (RxObserver_Base)
 
 - (void)addRxObserver:(HWRxObserver *)observer {
-    if ([observer.keyPath isEqualToString:@"tap"]) {
+    if ([observer.keyPath isEqualToString:@"RxObserver_tap"]) {
         [self addGestureObserver:observer];
         [self.rx_observers addObject:observer];
     } else {
@@ -43,7 +43,7 @@
     if (self.rx_observers.count != 0) {
         self.rx_observers = (NSMutableArray *)self.rx_observers
         .filter(^(HWRxObserver *observer) {
-            return @(![observer.keyPath isEqualToString:@"tap"]);
+            return @(![observer.keyPath isEqualToString:@"RxObserver_tap"]);
         });
         [self removeAllRxObserver];
         [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -57,18 +57,11 @@
 @implementation UIView (RxObserver)
 
 - (HWRxObserver *)rx_tap {
-    return self.Rx(@"tap");
+    return self.Rx(@"RxObserver_tap");
 }
 
 @end
 
-@implementation UILabel (RxObserver)
-
-- (HWRxObserver *)rx_text {
-    return self.Rx(@"text");
-}
-
-@end
 
 @implementation UITextField (RxObserver)
 
@@ -79,7 +72,34 @@
 }
 
 - (void)textFiledEditChanged:(NSNotification *)notification {
-    self.text = self.text;
+    self.rx_repost(@"text");
+}
+
+@end
+
+
+@implementation UIResponder (RxObserver_dealloc)
+
+- (HWRxObserver *)rx_dealloc {
+    return self.Rx(@"RxObserver_dealloc");
+}
+
+#pragma mark - Method Swizzling
++ (void)load {
+    Method originalMethod = class_getInstanceMethod([self class], NSSelectorFromString(@"dealloc"));
+    Method swizzledMethod = class_getInstanceMethod([self class], @selector(RxObserver_dealloc));
+    method_exchangeImplementations(originalMethod, swizzledMethod);
+}
+
+- (void)RxObserver_dealloc {
+    if (self.rx_observers.count != 0) {
+        self.rx_observers.forEach(^(HWRxObserver *observer) {
+            if ([observer.keyPath isEqualToString:@"RxObserver_dealloc"]) {
+                [observer setValue:@"RxObserver_dealloc" forKey:@"rxObj"];
+            }
+        });
+    }
+    [self RxObserver_dealloc];
 }
 
 @end

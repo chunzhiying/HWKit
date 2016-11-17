@@ -17,6 +17,7 @@ __strong __typeof(weak_##object) strong_##object = weak_##object;
 if(atBlock) { atBlock(__VA_ARGS__); }
 
 #import "HWRxObserver.h"
+#import <objc/runtime.h>
 #import "NSArray+FunctionalType.h"
 
 @interface HWRxObserver ()
@@ -26,6 +27,7 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     NSObject *_latestData;
     NSObject *_startWithData;
     NSMutableArray<nextType> *_nextBlockAry;
+    NSMutableArray<nextBlankType> *_nextBlankBlockAry;
     
     BOOL _debounceEnable;
     BOOL _throttleEnable;
@@ -44,6 +46,7 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     if (self) {
         self.tapAction = @selector(onTap);
         _nextBlockAry = [NSMutableArray new];
+        _nextBlankBlockAry = [NSMutableArray new];
         _debounceEnable = YES;
         _throttleEnable = YES;
         _connect = YES;
@@ -53,11 +56,6 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     return self;
 }
 
-- (instancetype)initWithBaseData:(id)data {
-    self = [self init];
-    _latestData = data;
-    return self;
-}
 
 - (void)dealloc {
     
@@ -65,6 +63,13 @@ if(atBlock) { atBlock(__VA_ARGS__); }
 
 - (void)onTap {
     self.rxObj = @"onTap";
+}
+
+- (void)setKeyPath:(NSString *)keyPath {
+    _keyPath = keyPath;
+    if (_target && class_getProperty([_target class], [keyPath cStringUsingEncoding:NSASCIIStringEncoding])) {
+        _latestData = [_target valueForKey:keyPath];
+    }
 }
 
 - (void)setRxObj:(NSObject *)rxObj {
@@ -103,20 +108,32 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     SafeBlock(block, data);
 }
 
+- (void)postTo:(nextBlankType)block {
+    if (!_connect) {
+        return;
+    }
+    SafeBlock(block);
+}
+
 - (void)postAllWith:(NSObject *)data {
     _nextBlockAry.forEach(^(nextType block) {
         [self postTo:block with:data];
     });
+    _nextBlankBlockAry.forEach(^(nextType block) {
+        [self postTo:block];
+    });
 }
 
 #pragma mark - Register
-- (void)registerObserver:(NSObject *)object {
+- (void)registeredToObserve:(NSObject *)object {
     if ([object isKindOfClass:[NSNotificationCenter class]]) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onNofication:)
                                                      name:self.keyPath object:nil];
-    } else {
+    }
+    
+    if (class_getProperty([object class], [self.keyPath cStringUsingEncoding:NSASCIIStringEncoding])) {
         [object addObserver:self forKeyPath:self.keyPath
-                  options:NSKeyValueObservingOptionNew context:NULL];
+                    options:NSKeyValueObservingOptionNew context:NULL];
     }
 }
 
@@ -147,6 +164,13 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     return ^(nextType block) {
         [_nextBlockAry addObject:block];
         [self postTo:block with:_startWithData];
+        return self;
+    };
+}
+
+- (HWRxObserver *(^)(nextBlankType))response {
+    return ^(nextBlankType block) {
+        [_nextBlankBlockAry addObject:block];
         return self;
     };
 }
@@ -217,6 +241,17 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     };
 }
 
+- (HWRxObserver *(^)(HWRxObserver *))takeUntil {
+    return ^(HWRxObserver *another) {
+        weak(self)
+        another.subscribe(^(id data) {
+            strong(self)
+            strong_self.disconnect();
+        });
+        return self;
+    };
+}
+
 @end
 
 @implementation HWRxObserver (Functional_Extension)
@@ -247,13 +282,12 @@ if(atBlock) { atBlock(__VA_ARGS__); }
 }
 
 - (HWRxObserver *(^)(id, reduceType))reduce {
-    return ^(id result, reduceType block) {
+    return ^(id original, reduceType block) {
         HWRxObserver *observer = [HWRxObserver new];
-        weak(result)
+        __block id result = original;
         self.subscribe(^(id obj) {
-            strong(result)
-            strong_result = block(strong_result, obj);
-            observer.rxObj = strong_result;
+            result = block(result, obj);
+            observer.rxObj = result;
         });
         return observer;
     };

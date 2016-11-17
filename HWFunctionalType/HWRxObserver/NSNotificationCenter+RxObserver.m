@@ -7,14 +7,17 @@
 //
 
 #import "NSNotificationCenter+RxObserver.h"
+#import "NSArray+FunctionalType.h"
 
 @implementation NSNotificationCenter (RxObserver)
 
-- (HWRxObserver *(^)(NSString *))Rx {
+- (void (^)(NSString *))rx_repost {
     return ^(NSString *notifyName) {
-        return [HWRxObserver new].then(^(HWRxObserver *observer) {
-            observer.keyPath = notifyName;
-            [self addRxObserver:observer];
+        self.rx_observers.forEach(^(HWRxObserver *observer){
+            if ([observer.keyPath isEqualToString:notifyName]) {
+                [self postNotificationName:notifyName object:nil userInfo:[observer valueForKey:@"_latestData"]];
+                return;
+            }
         });
     };
 }
