@@ -55,8 +55,6 @@ typedef NSComparisonResult(^sortType)(id obj1, id obj2);
 
 
 Interface(NSObject, IFace_then)
-Interface(UIView, IFace_then)
 Implementation(NSObject, Imp_then)
-Implementation(UIView, Imp_then)
 
 

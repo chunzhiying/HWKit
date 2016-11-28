@@ -157,19 +157,27 @@
 
 - (NSArray *(^)(forEachType))forEach {
     return ^(forEachType block) {
-        for (id obj in self) {
-            block(obj);
+        if (!self) {
+            return [NSArray new];
+        } else {
+            for (id obj in self) {
+                block(obj);
+            }
+            return self;
         }
-        return self;
     };
 }
 
 - (NSArray *(^)(forEachWithIndexType))forEachWithIndex {
     return ^(forEachWithIndexType block) {
-        for (NSInteger i = 0; i < self.count; i++) {
-            block([self objectAtIndex:i], i);
+        if (!self) {
+            return [NSArray new];
+        } else {
+            for (NSInteger i = 0; i < self.count; i++) {
+                block([self objectAtIndex:i], i);
+            }
+            return self;
         }
-        return self;
     };
 }
 

@@ -92,6 +92,10 @@
 }
 
 - (void)RxObserver_dealloc {
+    
+    if (![self isKindOfClass:[UIView class]] && ![self isKindOfClass:[UIViewController class]] ) {
+        return;
+    }
     if (self.rx_observers.count != 0) {
         self.rx_observers.forEach(^(HWRxObserver *observer) {
             if ([observer.keyPath isEqualToString:@"RxObserver_dealloc"]) {
