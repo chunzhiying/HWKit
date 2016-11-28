@@ -624,3 +624,49 @@ if(atBlock) {\
 
 @end
 
+
+@implementation HWRichText (Functional_Extension)
+
+- (HWRichText *(^)(NSString *))insertStr {
+    return ^(NSString *string) {
+        [self insertString:string];
+        return self;
+    };
+}
+
+- (HWRichText *(^)(NSString *, UIFont *, UIColor *))insertStrFontColor {
+    return ^(NSString *string, UIFont *font, UIColor *color) {
+        [self insertString:string withFont:font withTextColor:color];
+        return self;
+    };
+}
+
+- (HWRichText *(^)(NSString *, TargetSelector))insertStrAction {
+    return ^(NSString *string, TargetSelector selector) {
+        [self insertString:string withSelector:selector];
+        return self;
+    };
+}
+
+- (HWRichText *(^)(NSString *, UIFont *, TargetSelector))insertStrFontAction {
+    return ^(NSString *string, UIFont *font, TargetSelector selector) {
+        [self insertString:string withFont:font withSelector:selector];
+        return self;
+    };
+}
+
+- (HWRichText *(^)(UIImage *, CGRect))insertImgBounds {
+    return ^(UIImage *image, CGRect rect) {
+        [self insertImage:image withBounds:rect];
+        return self;
+    };
+}
+
+- (HWRichText *(^)(UIImage *, CGRect, TargetSelector))insertImgBoundsAction {
+    return ^(UIImage *image, CGRect rect, TargetSelector selector) {
+        [self insertImage:image withBounds:rect withSelector:selector];
+        return self;
+    };
+}
+
+@end

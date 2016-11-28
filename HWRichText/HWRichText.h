@@ -40,6 +40,19 @@ typedef void(^TargetSelector)();
 @end
 
 
+@interface HWRichText (Functional_Extension)
+
+@property (nonatomic, readonly) HWRichText *(^insertStr)(NSString *);
+@property (nonatomic, readonly) HWRichText *(^insertStrFontColor)(NSString *, UIFont *, UIColor *);
+@property (nonatomic, readonly) HWRichText *(^insertStrAction)(NSString *, TargetSelector);
+@property (nonatomic, readonly) HWRichText *(^insertStrFontAction)(NSString *, UIFont *, TargetSelector);
+
+@property (nonatomic, readonly) HWRichText *(^insertImgBounds)(UIImage *, CGRect);
+@property (nonatomic, readonly) HWRichText *(^insertImgBoundsAction)(UIImage *, CGRect, TargetSelector);
+
+@end
+
+
 @protocol HWParserSetting <NSObject>
 
 @property (nonatomic, strong) NSRegularExpression *regex;
