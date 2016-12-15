@@ -17,6 +17,7 @@
 
 @interface HWAnimation () <CAAnimationDelegate>
 {
+    BOOL _autoRemoved;
     HWAnimationType _type;
     HWFillMode _fillMode;
     HWTimingFunctionType _timingFunction;
@@ -30,6 +31,14 @@
 @end
 
 @implementation HWAnimation
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _autoRemoved = YES;
+    }
+    return self;
+}
 
 - (NSString *)keyPath {
     return  [NSString stringWithFormat:@"HWAnimation_%@", _keyPath];
@@ -59,7 +68,9 @@
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
     SafeBlock(_block, flag);
-    [_layer removeHWAnimation:self];
+    if (_autoRemoved) {
+        [_layer removeHWAnimation:self];
+    }
 }
 
 @end
@@ -96,6 +107,13 @@
     return ^(CALayer *layer) {
         [self shouldAutoSet:layer];
         [layer addHWAnimation:self];
+        return self;
+    };
+}
+
+- (HWAnimation *(^)(BOOL))autoRemoved {
+    return ^(BOOL autoRemoved) {
+        _autoRemoved = autoRemoved;
         return self;
     };
 }

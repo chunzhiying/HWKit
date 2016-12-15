@@ -54,6 +54,7 @@ typedef NS_ENUM(NSUInteger, HWTimingFunctionType) {
 @property (nonatomic, readonly) HWAnimation *(^animate)(HWAnimationType, NSString *);
 @property (nonatomic, readonly) HWAnimation *(^finish)(finishedBlock);
 @property (nonatomic, readonly) HWAnimation *(^addTo)(CALayer *);
+@property (nonatomic, readonly) HWAnimation *(^autoRemoved)(BOOL); //default: YES
 
 @property (nonatomic, readonly) HWAnimation *(^duration)(CFTimeInterval);
 @property (nonatomic, readonly) HWAnimation *(^beginTime)(CFTimeInterval);
