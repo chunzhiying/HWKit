@@ -6,12 +6,14 @@
 //  Copyright © 2016年 YY. All rights reserved.
 //
 
-#import "HWAnimation.h"
 #import "NSArray+FunctionalType.h"
+
+@class HWAnimation;
 
 @interface CALayer (HWAnimation)
 
 - (void)addHWAnimation:(HWAnimation *)anim;
 - (void)removeHWAnimation:(HWAnimation *)anim;
+- (void)removeAllHWAnimation;
 
 @end

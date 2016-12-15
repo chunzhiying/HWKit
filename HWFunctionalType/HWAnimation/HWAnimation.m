@@ -59,6 +59,7 @@
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
     SafeBlock(_block, flag);
+    [_layer removeHWAnimation:self];
 }
 
 @end
@@ -93,27 +94,35 @@
 
 - (HWAnimation *(^)(CALayer *))addTo {
     return ^(CALayer *layer) {
-        [self shouldRetainLayer:layer];
+        [self shouldAutoSet:layer];
         [layer addHWAnimation:self];
         return self;
     };
 }
 
-- (void)shouldRetainLayer:(CALayer *)layer {
-    if (_fillMode != HW_FillMode_Retain) {
-        return;
-    }
+#pragma mark - Auto Set
+- (void)shouldAutoSet:(CALayer *)layer {
     if (_type == HW_Group) {
         NSArray *keyPaths = [_keyPath componentsSeparatedByString:SeparateSymbol];
         keyPaths.justTail(keyPaths.count - 1).forEachWithIndex(^(NSString *keyPath, NSUInteger index) {
             CAAnimation *anim = [_animationGroup.animations objectAtIndex:index];
-            if ([anim isKindOfClass:[CABasicAnimation class]] && [(CABasicAnimation *)anim toValue]) {
-                [layer setValue:[(CABasicAnimation *)anim toValue] forKeyPath:keyPath];
+            if ([anim isKindOfClass:[CABasicAnimation class]]) {
+                if (![(CABasicAnimation *)anim fromValue]) {
+                    [(CABasicAnimation *)anim setFromValue:[layer valueForKeyPath:keyPath]];
+                }
+                if ([(CABasicAnimation *)anim toValue] && _fillMode == HW_FillMode_Retain) {
+                    [layer setValue:[(CABasicAnimation *)anim toValue] forKeyPath:keyPath];
+                }
             }
         });
     }
-    if (_type == HW_Basic && _basicAnimation.toValue) {
-        [layer setValue:_basicAnimation.toValue forKeyPath:_keyPath];
+    if (_type == HW_Basic) {
+        if (!_basicAnimation.fromValue) {
+            [_basicAnimation setFromValue:[layer valueForKeyPath:_keyPath]];
+        }
+        if (_basicAnimation.toValue && _fillMode == HW_FillMode_Retain) {
+            [layer setValue:_basicAnimation.toValue forKeyPath:_keyPath];
+        }
     }
 }
 

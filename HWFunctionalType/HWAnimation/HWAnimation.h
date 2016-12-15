@@ -8,6 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
+#import "CALayer+HWAnimation.h"
+
+#define HWValueForPosition(pos) [NSValue valueWithCGPoint:pos]
+#define HWValueForSize(size) [NSValue valueWithCGSize:size]
+#define HWValueForRect(rect) [NSValue valueWithCGRect:rect]
 
 typedef void(^finishedBlock)(BOOL);
 
@@ -86,6 +91,7 @@ typedef NS_ENUM(NSUInteger, HWTimingFunctionType) {
 @property (nonatomic, readonly) HWAnimation *(^animations)(NSArray<HWAnimation *> *);
 
 @end
+
 
 @interface NSArray (HWAnimation_Extension)
 

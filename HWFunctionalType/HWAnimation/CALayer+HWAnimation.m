@@ -6,6 +6,7 @@
 //  Copyright © 2016年 YY. All rights reserved.
 //
 
+#import "HWAnimation.h"
 #import "CALayer+HWAnimation.h"
 
 #define HWAnimationsKey @"HWAnimations"
@@ -24,6 +25,16 @@
     NSMutableArray *animations = [[NSMutableArray alloc] initWithArray:[self valueForKey:HWAnimationsKey]];
     [animations removeObject:anim];
     [self setValue:animations forKey:HWAnimationsKey];
+}
+
+- (void)removeAllHWAnimation {
+    NSArray *animations = [self valueForKey:HWAnimationsKey];
+    if ([animations isKindOfClass:[NSArray class]] && animations.count > 0) {
+        animations.forEach(^(HWAnimation *anim) {
+            anim.cancle();
+        });
+    }
+    [self setValue:[NSArray new] forKey:HWAnimationsKey];
 }
 
 @end
