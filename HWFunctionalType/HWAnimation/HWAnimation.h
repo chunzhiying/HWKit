@@ -10,16 +10,15 @@
 #import <QuartzCore/QuartzCore.h>
 #import "CALayer+HWAnimation.h"
 
-#define HWValueForPosition(pos) [NSValue valueWithCGPoint:pos]
-#define HWValueForSize(size) [NSValue valueWithCGSize:size]
-#define HWValueForRect(rect) [NSValue valueWithCGRect:rect]
+#define HWAnimInstance [HWAnimation new]
 
-typedef void(^finishedBlock)(BOOL);
+typedef void(^FinishedBlock)(BOOL);
+typedef void(^StopBlock)();
 
 typedef NS_ENUM(NSUInteger, HWAnimationType) {
-    HW_Basic,
-    HW_KeyFrame,
-    HW_Group
+    HW_Animation_Basic,
+    HW_Animation_KeyFrame,
+    HW_Animation_Group
 };
 
 typedef NS_ENUM(NSUInteger, HWFillMode) {
@@ -31,10 +30,10 @@ typedef NS_ENUM(NSUInteger, HWFillMode) {
 };
 
 typedef NS_ENUM(NSUInteger, HWTimingFunctionType) {
+    HW_TimingFunction_EaseInEaseOut,
     HW_TimingFunction_Linear,
     HW_TimingFunction_EaseIn,
     HW_TimingFunction_EaseOut,
-    HW_TimingFunction_EaseInEaseOut
 };
 
 @interface HWAnimation : NSObject
@@ -52,16 +51,17 @@ typedef NS_ENUM(NSUInteger, HWTimingFunctionType) {
 @interface HWAnimation (Base)
 
 @property (nonatomic, readonly) HWAnimation *(^animate)(HWAnimationType, NSString *);
-@property (nonatomic, readonly) HWAnimation *(^finish)(finishedBlock);
 @property (nonatomic, readonly) HWAnimation *(^addTo)(CALayer *);
-@property (nonatomic, readonly) HWAnimation *(^autoRemoved)(BOOL); //default: YES
+
+@property (nonatomic, readonly) HWAnimation *(^finish)(FinishedBlock);
+@property (nonatomic, readonly) HWAnimation *(^stop)(StopBlock);
 
 @property (nonatomic, readonly) HWAnimation *(^duration)(CFTimeInterval);
 @property (nonatomic, readonly) HWAnimation *(^beginTime)(CFTimeInterval);
 @property (nonatomic, readonly) HWAnimation *(^repeatCount)(float);
-@property (nonatomic, readonly) HWAnimation *(^timingFunction)(HWTimingFunctionType);
 
-@property (nonatomic, readonly) HWAnimation *(^removedOnCompletion)(BOOL);
+@property (nonatomic, readonly) HWAnimation *(^autoRemoved)(BOOL); //default: YES
+@property (nonatomic, readonly) HWAnimation *(^timingFunction)(HWTimingFunctionType);
 @property (nonatomic, readonly) HWAnimation *(^fillMode)(HWFillMode);
 
 @end

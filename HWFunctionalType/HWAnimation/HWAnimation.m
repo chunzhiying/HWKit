@@ -26,7 +26,8 @@
     CAAnimationGroup *_animationGroup;
 }
 
-@property (nonatomic, copy) finishedBlock block;
+@property (nonatomic, copy) FinishedBlock finishedblock;
+@property (nonatomic, copy) StopBlock stopBlock;
 
 @end
 
@@ -46,9 +47,9 @@
 
 - (CAAnimation *)animation {
     switch (_type) {
-        case HW_Basic: return _basicAnimation;
-        case HW_KeyFrame: return _keyFrameAnimation;
-        case HW_Group: return _animationGroup;
+        case HW_Animation_Basic: return _basicAnimation;
+        case HW_Animation_KeyFrame: return _keyFrameAnimation;
+        case HW_Animation_Group: return _animationGroup;
     }
 }
 
@@ -67,7 +68,8 @@
 }
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
-    SafeBlock(_block, flag);
+    SafeBlock(_finishedblock, flag);
+    SafeBlock(_stopBlock);
     if (_autoRemoved) {
         [_layer removeHWAnimation:self];
     }
@@ -82,13 +84,14 @@
         _type = type;
         self.keyPath = keyPath;
         switch (_type) {
-            case HW_Basic:
+            case HW_Animation_Basic:
                 _basicAnimation = [CABasicAnimation animationWithKeyPath:keyPath];
                 break;
-            case HW_KeyFrame:
+            case HW_Animation_KeyFrame:
                 _keyFrameAnimation = [CAKeyframeAnimation animationWithKeyPath:keyPath];
                 break;
-            default:
+            case HW_Animation_Group:
+                self.animateGroup();
                 break;
         }
         self.animation.delegate = self;
@@ -96,9 +99,16 @@
     };
 }
 
-- (HWAnimation *(^)(finishedBlock))finish {
-    return  ^(finishedBlock block) {
-        _block = block;
+- (HWAnimation *(^)(FinishedBlock))finish {
+    return  ^(FinishedBlock block) {
+        self.finishedblock = block;
+        return self;
+    };
+}
+
+- (HWAnimation *(^)(StopBlock))stop {
+    return  ^(StopBlock block) {
+        self.stopBlock = block;
         return self;
     };
 }
@@ -120,7 +130,7 @@
 
 #pragma mark - Auto Set
 - (void)shouldAutoSet:(CALayer *)layer {
-    if (_type == HW_Group) {
+    if (_type == HW_Animation_Group) {
         NSArray *keyPaths = [_keyPath componentsSeparatedByString:SeparateSymbol];
         keyPaths.justTail(keyPaths.count - 1).forEachWithIndex(^(NSString *keyPath, NSUInteger index) {
             CAAnimation *anim = [_animationGroup.animations objectAtIndex:index];
@@ -134,7 +144,7 @@
             }
         });
     }
-    if (_type == HW_Basic) {
+    if (_type == HW_Animation_Basic) {
         if (!_basicAnimation.fromValue) {
             [_basicAnimation setFromValue:[layer valueForKeyPath:_keyPath]];
         }
@@ -162,13 +172,6 @@
 - (HWAnimation *(^)(float))repeatCount {
     return ^(float repeatCount){
         self.animation.repeatCount = repeatCount;
-        return self;
-    };
-}
-
-- (HWAnimation *(^)(BOOL))removedOnCompletion {
-    return ^(BOOL removedOnCompletion){
-        self.animation.removedOnCompletion = removedOnCompletion;
         return self;
     };
 }
@@ -300,7 +303,7 @@
 
 - (HWAnimation *(^)())animateGroup {
     return ^{
-        _type = HW_Group;
+        _type = HW_Animation_Group;
         _animationGroup = [CAAnimationGroup animation];
         self.keyPath = @"group";
         self.animation.delegate = self;
