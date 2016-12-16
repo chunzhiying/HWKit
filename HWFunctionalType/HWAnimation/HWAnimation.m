@@ -65,9 +65,16 @@
     };
 }
 
-- (HWAnimation *(^)())cancle {
+- (HWAnimation *(^)())cancel {
     return ^{
         [_layer removeAnimationForKey:self.keyPath];
+        return self;
+    };
+}
+
+- (HWAnimation *(^)())dispose {
+    return ^{
+        self.animation.delegate = nil;
         return self;
     };
 }
@@ -76,9 +83,9 @@
     SafeBlock(_finishedblock, flag);
     SafeBlock(_stopBlock);
     if (_autoRemoved) {
+        self.animation.delegate = nil;
         [_layer removeHWAnimation:self];
     }
-    self.animation.delegate = nil;
 }
 
 @end
@@ -123,7 +130,9 @@
     return ^(CALayer *layer) {
         self.layer = layer;
         [self shouldAutoSet];
-        [layer addHWAnimation:self];
+        if (_autoRemoved) {
+            [layer addHWAnimation:self];
+        }
         return self;
     };
 }

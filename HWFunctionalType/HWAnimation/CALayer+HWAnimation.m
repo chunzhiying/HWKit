@@ -21,7 +21,7 @@
 }
 
 - (void)removeHWAnimation:(HWAnimation *)anim {
-    anim.cancle();
+    anim.cancel();
     NSMutableArray *animations = [[NSMutableArray alloc] initWithArray:[self valueForKey:HWAnimationsKey]];
     [animations removeObject:anim];
     [self setValue:animations forKey:HWAnimationsKey];
@@ -31,7 +31,7 @@
     NSArray *animations = [self valueForKey:HWAnimationsKey];
     if ([animations isKindOfClass:[NSArray class]] && animations.count > 0) {
         animations.forEach(^(HWAnimation *anim) {
-            anim.cancle();
+            anim.cancel();
         });
     }
     [self setValue:[NSArray new] forKey:HWAnimationsKey];

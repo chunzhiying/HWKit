@@ -43,7 +43,8 @@ typedef NS_ENUM(NSUInteger, HWTimingFunctionType) {
 @property (nonatomic, readonly) CAAnimation *animation;
 
 @property (nonatomic, readonly) HWAnimation *(^run)();
-@property (nonatomic, readonly) HWAnimation *(^cancle)();
+@property (nonatomic, readonly) HWAnimation *(^cancel)();
+@property (nonatomic, readonly) HWAnimation *(^dispose)(); //when autoRemoved(NO), should call
 
 @end
 
