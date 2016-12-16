@@ -14,6 +14,6 @@
 
 - (void)addHWAnimation:(HWAnimation *)anim;
 - (void)removeHWAnimation:(HWAnimation *)anim;
-- (void)removeAllHWAnimation;
+- (void)removeAllHWAnimations;
 
 @end

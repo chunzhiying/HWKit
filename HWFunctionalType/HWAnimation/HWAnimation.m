@@ -36,9 +36,14 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        _keyPath = @"instance";
         _autoRemoved = YES;
     }
     return self;
+}
+
+- (void)dealloc {
+
 }
 
 - (NSString *)keyPath {
@@ -73,6 +78,7 @@
     if (_autoRemoved) {
         [_layer removeHWAnimation:self];
     }
+    self.animation.delegate = nil;
 }
 
 @end
@@ -115,7 +121,8 @@
 
 - (HWAnimation *(^)(CALayer *))addTo {
     return ^(CALayer *layer) {
-        [self shouldAutoSet:layer];
+        self.layer = layer;
+        [self shouldAutoSet];
         [layer addHWAnimation:self];
         return self;
     };
@@ -129,29 +136,54 @@
 }
 
 #pragma mark - Auto Set
-- (void)shouldAutoSet:(CALayer *)layer {
-    if (_type == HW_Animation_Group) {
-        NSArray *keyPaths = [_keyPath componentsSeparatedByString:SeparateSymbol];
-        keyPaths.justTail(keyPaths.count - 1).forEachWithIndex(^(NSString *keyPath, NSUInteger index) {
-            CAAnimation *anim = [_animationGroup.animations objectAtIndex:index];
-            if ([anim isKindOfClass:[CABasicAnimation class]]) {
-                if (![(CABasicAnimation *)anim fromValue]) {
-                    [(CABasicAnimation *)anim setFromValue:[layer valueForKeyPath:keyPath]];
-                }
-                if ([(CABasicAnimation *)anim toValue] && _fillMode == HW_FillMode_Retain) {
-                    [layer setValue:[(CABasicAnimation *)anim toValue] forKeyPath:keyPath];
-                }
-            }
-        });
+- (void)shouldAutoSet {
+    switch (_type) {
+        case HW_Animation_Basic:
+            [self handleBasicAnimation:_basicAnimation keyPath:_keyPath];
+            return;
+        case HW_Animation_Group:
+            [self handleAnimationGroup:_animationGroup];
+            return;
+        default:
+            return;
     }
-    if (_type == HW_Animation_Basic) {
-        if (!_basicAnimation.fromValue) {
-            [_basicAnimation setFromValue:[layer valueForKeyPath:_keyPath]];
-        }
-        if (_basicAnimation.toValue && _fillMode == HW_FillMode_Retain) {
-            [layer setValue:_basicAnimation.toValue forKeyPath:_keyPath];
-        }
+}
+
+- (void)handleBasicAnimation:(CABasicAnimation *)basicAnimation keyPath:(NSString *)keyPath {
+    if (!basicAnimation.fromValue) {
+        [basicAnimation setFromValue:[_layer valueForKeyPath:keyPath]];
     }
+    if (basicAnimation.toValue && _fillMode == HW_FillMode_Retain) {
+        [_layer setValue:basicAnimation.toValue forKeyPath:keyPath];
+    }
+}
+
+- (void)handleAnimationGroup:(CAAnimationGroup *)animationGroup {
+    NSArray *animations = [self flatmapAnimationGroup:animationGroup];
+    NSArray *keyPaths = [_keyPath componentsSeparatedByString:SeparateSymbol];
+    keyPaths.filter(^(NSString *keyPath) {
+        return @(![keyPath isEqualToString:@"group"]);
+    }).forEachWithIndex(^(NSString *keyPath, NSUInteger index)
+    {
+        CAAnimation *anim = [animations objectAtIndex:index];
+        if ([anim isKindOfClass:[CABasicAnimation class]]) {
+            [self handleBasicAnimation:(CABasicAnimation *)anim keyPath:keyPath];
+        } else if([anim isKindOfClass:[CAAnimationGroup class]]) {
+            [self handleAnimationGroup:(CAAnimationGroup *)anim];
+        }
+    });
+}
+
+- (NSArray<CAAnimation *> *)flatmapAnimationGroup:(CAAnimationGroup *)group {
+    NSMutableArray *result = [NSMutableArray new];
+    group.animations.forEach(^(CAAnimation *anim) {
+        if ([anim isKindOfClass:[CAAnimationGroup class]]) {
+            [result addObjectsFromArray:[self flatmapAnimationGroup:(CAAnimationGroup *)anim]];
+        } else {
+            [result addObject:anim];
+        }
+    });
+    return result;
 }
 
 #pragma mark -

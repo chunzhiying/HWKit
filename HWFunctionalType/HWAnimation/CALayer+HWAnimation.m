@@ -27,7 +27,7 @@
     [self setValue:animations forKey:HWAnimationsKey];
 }
 
-- (void)removeAllHWAnimation {
+- (void)removeAllHWAnimations {
     NSArray *animations = [self valueForKey:HWAnimationsKey];
     if ([animations isKindOfClass:[NSArray class]] && animations.count > 0) {
         animations.forEach(^(HWAnimation *anim) {
