@@ -105,6 +105,9 @@ if(atBlock) { atBlock(__VA_ARGS__); }
     if (!data || !_connect) {
         return;
     }
+    if ([data isEqual:_startWithData]) {
+        _startWithData = nil;
+    }
     SafeBlock(block, data);
 }
 

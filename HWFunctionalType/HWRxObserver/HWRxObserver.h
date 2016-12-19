@@ -31,7 +31,7 @@ typedef void(^nextType)(id obj);
 @interface HWRxObserver (Base_Extension)
 
 @property (nonatomic, readonly) HWRxObserver *(^subscribe)(nextType);
-@property (nonatomic, readonly) HWRxObserver *(^response)(nextBlankType);
+@property (nonatomic, readonly) HWRxObserver *(^response)(nextBlankType); //not response to startWith
 
 @property (nonatomic, readonly) HWRxObserver *(^bindTo)(id object, NSString *keyPath);
 @property (nonatomic, readonly) HWRxObserver *(^disposeBy)(NSObject *);
