@@ -205,7 +205,7 @@
 
 - (HWAnimation *(^)(CFTimeInterval))beginTime {
     return ^(CFTimeInterval beginTime){
-        self.animation.beginTime = beginTime;
+        self.animation.beginTime = CACurrentMediaTime() + beginTime;
         return self;
     };
 }
