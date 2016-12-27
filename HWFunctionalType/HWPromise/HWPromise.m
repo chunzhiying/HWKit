@@ -24,10 +24,13 @@
 
 @interface HWPromise ()
 {
-    thenType _successBlock;
-    thenType _failBlock;
+    finishType _successBlock;
+    finishType _failBlock;
     alwaysType _alwaysBlock;
+    
+    HWPromise *_nextPromise;
     completeType _completeBlock;
+    nextFinishedType _nextBlock;
 }
 
 @property (nonatomic, strong) NSArray<HWPromiseResult *> *results;
@@ -41,9 +44,13 @@
     if (!successObj) {
         return;
     }
-    SafeBlock(_successBlock, _successObj)
-    SafeBlock(_alwaysBlock, [HWPromiseResult allocWithStatus:YES
-                                                      Object:_successObj])
+
+    HWPromiseResult *result = [HWPromiseResult allocWithStatus:YES
+                                                        Object:successObj];
+    SafeBlock(_successBlock, successObj)
+    SafeBlock(_alwaysBlock, result)
+    [self shouldPassNext:YES];
+    
 }
 
 - (void)setFailObj:(id)failObj {
@@ -51,9 +58,12 @@
     if (!failObj) {
         return;
     }
-    SafeBlock(_failBlock, _failObj)
-    SafeBlock(_alwaysBlock, [HWPromiseResult allocWithStatus:NO
-                                                      Object:_failObj])
+    
+    HWPromiseResult *result = [HWPromiseResult allocWithStatus:NO
+                                                        Object:failObj];
+    SafeBlock(_failBlock, failObj)
+    SafeBlock(_alwaysBlock, result)
+    [self shouldPassNext:NO];
 }
 
 - (void)setResults:(NSArray<HWPromiseResult *> *)results {
@@ -75,12 +85,30 @@
     return promise;
 }
 
+- (void)shouldPassNext:(BOOL)shouldPass {
+    if (!_nextBlock) {
+        return;
+    }
+    
+    if (shouldPass) {
+        _nextBlock(_successObj)
+        .always(^(HWPromiseResult *result) {
+            result.status
+            ? (_nextPromise.successObj = result.object)
+            : (_nextPromise.failObj = result.object);
+        });
+    } else {
+         _nextPromise.failObj = _failObj;
+    }
+}
+
 @end
+
 
 @implementation HWPromise (FunctionalType_Extension)
 
-- (HWPromise *(^)(thenType))success {
-    return ^(thenType block) {
+- (HWPromise *(^)(finishType))success {
+    return ^(finishType block) {
         _successBlock = block;
         if (_successObj) {
             SafeBlock(block, _successObj)
@@ -89,8 +117,8 @@
     };
 }
 
-- (HWPromise *(^)(thenType))fail {
-    return ^(thenType block) {
+- (HWPromise *(^)(finishType))fail {
+    return ^(finishType block) {
         _failBlock = block;
         if (_failObj) {
             SafeBlock(block, _failObj)
@@ -112,6 +140,10 @@
     };
 }
 
+@end
+
+@implementation HWPromise (CallBack_Hell_Extension)
+
 - (HWPromise *(^)(completeType))complete {
     return ^(completeType block){
         _completeBlock = block;
@@ -122,7 +154,22 @@
     };
 }
 
+- (HWPromise *(^)(nextFinishedType))next {
+    return ^(nextFinishedType block) {
+        _nextBlock = block;
+        _nextPromise = [HWPromise new];
+        if (_failObj) {
+            [self shouldPassNext:NO];
+        }
+        else if (_successObj) {
+            [self shouldPassNext:YES];
+        }
+        return _nextPromise;
+    };
+}
+
 @end
+
 
 @implementation NSArray (Promise_Extension)
 

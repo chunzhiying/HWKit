@@ -8,13 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-#define HWPromiseNetworkFail promise.failObj = @"网络异常";
-
 @class HWPromiseResult;
+@class HWPromise;
 
-typedef void(^thenType)(id obj);
+typedef void(^finishType)(id obj);
 typedef void(^alwaysType)(HWPromiseResult *result);
 typedef void(^completeType)(NSArray<HWPromiseResult *> *results);
+typedef HWPromise *(^nextFinishedType)(id obj);
+
 
 @interface HWPromise<__covariant SuccessT, __covariant FailT> : NSObject
 
@@ -23,19 +24,28 @@ typedef void(^completeType)(NSArray<HWPromiseResult *> *results);
 
 @end
 
-@interface HWPromise (FunctionalType_Extension)
-
-@property (nonatomic, readonly) HWPromise *(^success)(thenType);
-@property (nonatomic, readonly) HWPromise *(^fail)(thenType);
-@property (nonatomic, readonly) HWPromise *(^always)(alwaysType);
-@property (nonatomic, readonly) HWPromise *(^complete)(completeType);
-
-@end
 
 @interface HWPromiseResult : NSObject
 
 @property (nonatomic) BOOL status;
 @property (nonatomic, strong) id object; // SuccessT || FailT
+
+@end
+
+
+@interface HWPromise (FunctionalType_Extension)
+
+@property (nonatomic, readonly) HWPromise *(^success)(finishType);
+@property (nonatomic, readonly) HWPromise *(^fail)(finishType);
+@property (nonatomic, readonly) HWPromise *(^always)(alwaysType);
+
+@end
+
+
+@interface HWPromise (CallBack_Hell_Extension)
+
+@property (nonatomic, readonly) HWPromise *(^next)(nextFinishedType);
+@property (nonatomic, readonly) HWPromise *(^complete)(completeType);
 
 @end
 
