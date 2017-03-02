@@ -165,9 +165,7 @@ __strong __typeof(weakSelf) strongSelf = weakSelf;
 }
 
 - (NSString *)checkStyle:(NSString *)symbol withTitle:(NSString *)title {
-    if (title.length >= 3
-        && [[title substringToIndex:1] isEqualToString:symbol]
-        && [[title substringFromIndex:title.length - 1] isEqualToString:symbol])
+    if (ChackIsSurroundBy(symbol, title))
     {
         title = [title substringWithRange:NSMakeRange(1, title.length - 2)];
     }

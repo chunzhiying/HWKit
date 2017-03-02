@@ -23,8 +23,8 @@ typedef NS_ENUM(NSInteger, HWAlertTextStyle) {
 };
 
 typedef void(^AlertBlock)();
-typedef void(^AlertOtherButtonsBlock)(HWAlertBlockData *data);
-typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField *textField);
+typedef void(^AlertOtherButtonsBlock)( HWAlertBlockData * _Nonnull data);
+typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField * _Nonnull textField);
 
 
 @interface HWAlertContainerController : UIViewController //for AutoRotation
@@ -34,7 +34,7 @@ typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField *t
 @interface HWAlertBlockData : NSObject
 
 @property (nonatomic) NSInteger index; //0, 1, 2, ...
-@property (nonatomic, strong) NSArray<UITextField *> *textfields;
+@property (nonatomic, strong, nonnull) NSArray<UITextField *> *textfields;
 
 @end
 
@@ -44,19 +44,23 @@ typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField *t
 @interface HWAlertController : UIView
 
 //without textfield
-- (instancetype)initWithTitle:(NSString *)title
-                      message:(NSString *)message
-                        style:(HWAlertControllerStyle)style
-            cancelButtonTitle:(NSString *)cancelButtonTitle cancelButtonBlock:(AlertBlock)cancelBlock
-            otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles otherButtonsBlock:(AlertOtherButtonsBlock)otherButtonsBlock;
+- (nullable instancetype)initWithTitle:(nullable NSString *)title
+                               message:(nullable NSString *)message
+                                 style:(HWAlertControllerStyle)style
+                     cancelButtonTitle:(nonnull NSString *)cancelButtonTitle
+                     cancelButtonBlock:(nullable AlertBlock)cancelBlock
+                     otherButtonTitles:(nullable NSArray<NSString *> *)otherButtonTitles
+                     otherButtonsBlock:(nullable AlertOtherButtonsBlock)otherButtonsBlock;
 
 //have textfield, Alert only
-- (instancetype)initWithTitle:(NSString *)title
-                      message:(NSString *)message
-                    textStyle:(HWAlertTextStyle)textStyle
-                    textfield:(AlertTextFieldConfigBlock)textFieldConfigBlock //customize textField
-            cancelButtonTitle:(NSString *)cancelButtonTitle cancelButtonBlock:(AlertOtherButtonsBlock)cancelBlock
-            otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles otherButtonsBlock:(AlertOtherButtonsBlock)otherButtonsBlock;
+- (nullable instancetype)initWithTitle:(nullable NSString *)title
+                               message:(nullable NSString *)message
+                             textStyle:(HWAlertTextStyle)textStyle
+                             textfield:(nullable AlertTextFieldConfigBlock)textFieldConfigBlock //customize textField
+                     cancelButtonTitle:(nonnull NSString *)cancelButtonTitle
+                     cancelButtonBlock:(nullable AlertOtherButtonsBlock)cancelBlock
+                     otherButtonTitles:(nullable NSArray<NSString *> *)otherButtonTitles
+                     otherButtonsBlock:(nullable AlertOtherButtonsBlock)otherButtonsBlock;
 
 - (void)show;
 
@@ -69,10 +73,12 @@ typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField *t
 @interface HWAlertController (Image)
 
 // not support #xx#, &xx&
-- (instancetype)initWithImage:(UIImage *)image
-                      message:(NSString *)message
-            cancelButtonTitle:(NSString *)cancelButtonTitle cancelButtonBlock:(AlertBlock)cancelBlock
-            otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles otherButtonsBlock:(AlertOtherButtonsBlock)otherButtonsBlock;
+- (nullable instancetype)initWithImage:(nonnull UIImage *)image
+                               message:(nullable NSString *)message
+                     cancelButtonTitle:(nonnull NSString *)cancelButtonTitle
+                     cancelButtonBlock:(nullable AlertBlock)cancelBlock
+                     otherButtonTitles:(nullable NSArray<NSString *> *)otherButtonTitles
+                     otherButtonsBlock:(nullable AlertOtherButtonsBlock)otherButtonsBlock;
 
 @end
 

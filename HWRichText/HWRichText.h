@@ -55,7 +55,7 @@ typedef void(^TargetSelector)();
 
 @protocol HWParserSetting <NSObject>
 
-@property (nonatomic, strong) NSRegularExpression *regex;
+@property (nonatomic, strong, readonly) NSRegularExpression *regex;
 
 - (void)onMactchedWithText:(NSString *)text inRichText:(HWRichText *)richText;
 
