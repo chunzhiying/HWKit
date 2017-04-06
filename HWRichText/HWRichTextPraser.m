@@ -8,15 +8,25 @@
 
 #import "HWRichTextPraser.h"
 #import "ColorUtil.h"
+#import "HWFunctionalType.h"
+#import "UICenter.h"
+#import "ATGlobalMacro.h"
 
 @implementation HWStockCodePraser
 
 - (NSRegularExpression *)regex {
-    return [NSRegularExpression regularExpressionWithPattern:@"\\$.{1,5}\\$" options:0 error:nil];
+    return [NSRegularExpression regularExpressionWithPattern:@"\\$\\*?[\u4E00-\u9FA5A-Za-z0-9]{2,6}\\([A-Za-z]{1,4}[0-9]{6}\\)\\$" options:0 error:nil];
 }
 
 - (void)onMactchedWithText:(NSString *)text inRichText:(HWRichText *)richText {
-    richText.insertStrFontColor(text, richText.font, DefaultTintColor);
+   
+    [richText setSelectorTextColor:DefaultTintColor];
+   
+    NSString *stock = [text substringWithRange:NSMakeRange(1, text.length - 2)];
+    NSArray *ary = [[stock componentsSeparatedByString:@")"].firstObject componentsSeparatedByString:@"("];
+    richText.insertStrAction(text, ^{
+        [[UICenter sharedObject] pushStockDetailViewCtlWithStockCode:ary.lastObject stockCnName:ary.firstObject];
+    });
 }
 
 @end

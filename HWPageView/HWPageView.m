@@ -7,6 +7,7 @@
 //
 
 #import "HWPageView.h"
+#import "HWHelper.h"
 
 #define tabItemTagKey @"tabItemTagKey"
 
@@ -21,9 +22,6 @@
 
 #define defaultSeparateLineColor [UIColor colorWithRed:217.f/255.f green:217.f/255.f blue:217.f/255.f alpha:1]
 #define defaultTabScrollBgColor [UIColor whiteColor]
-
-#define WidthOf(view) view.bounds.size.width
-#define HeightOf(view) view.bounds.size.height
 
 @interface UIView (ChangePosition)
 
@@ -108,8 +106,8 @@
 
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
-    _dot.position = CGPointMake((WidthOf(self) - defaultItemDotDiameter) / 2,
-                                HeightOf(self) - defaultItemDotDiameter - 3);
+    _dot.position = CGPointMake((self.width - defaultItemDotDiameter) / 2,
+                                self.height - defaultItemDotDiameter - 3);
 }
 
 - (void)setIsSelected:(BOOL)isSelected {
@@ -168,8 +166,10 @@
     
     UIView *_selectedLine;
     BOOL _isTabScrollCanRoll;
-    
+
 }
+
+@property (nonatomic) NSInteger selectedIndex;
 
 @end
 
@@ -236,9 +236,13 @@
     self.selectedIndex = _selectedIndex;
 }
 
+- (void)changePageToIndex:(NSInteger)index {
+    self.selectedIndex = index;
+}
+
 #pragma mark - Custom Method
 - (void)initSeparateline {
-    _separateline = [[UIView alloc] initWithFrame:CGRectMake(0, HeightOf(_tabScroll), WidthOf(_tabScroll), 0.5)];
+    _separateline = [[UIView alloc] initWithFrame:CGRectMake(0, _tabScroll.height, _tabScroll.width, 0.5)];
     _separateline.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _separateline.backgroundColor = defaultSeparateLineColor;
     [self addSubview:_separateline];
@@ -275,7 +279,7 @@
         tabBgColor = [_delegate colorForTabBgInPageView:self];
     }
     
-    for (NSInteger index = 0; index < [_dataSource numberOfPages]; index++) {
+    for (NSInteger index = 0, count = [_dataSource numberOfPages]; index < count; index++) {
         TabItem *tabItem = [[TabItem alloc] initWithFrame:CGRectZero
                                                 withTitle:[_dataSource pageView:self titleAtIndex:index]
                                           withNormalColor:_tabTitleNormalColor
@@ -308,7 +312,7 @@
     
     _pageScroll = [[UIScrollView alloc] initWithFrame:CGRectZero];
     
-    for (NSInteger index = 0; index < [_dataSource numberOfPages]; index++) {
+    for (NSInteger index = 0, count = [_dataSource numberOfPages]; index < count; index++) {
         UIView *contentView = [_dataSource pageView:self viewAtIndex:index];
         [_pageScroll addSubview:contentView];
         [_pageAry addObject:contentView];
@@ -336,17 +340,17 @@
 }
 
 - (void)handleGradualChangeWithContentOffset:(CGPoint)offset {
-    CGFloat selectedOffsetX = _selectedIndex * WidthOf(_pageScroll);
+    CGFloat selectedOffsetX = _selectedIndex * _pageScroll.width;
     
-    if (offset.x <= 0 || offset.x >= (WidthOf(_pageScroll) * (_tabAry.count - 1))
-        || fabs(selectedOffsetX - offset.x) >=  (2 * WidthOf(_pageScroll))) {
+    if (offset.x <= 0 || offset.x >= (_pageScroll.width * (_tabAry.count - 1))
+        || fabs(selectedOffsetX - offset.x) >=  (2 * _pageScroll.width)) {
         return;
     }
     
     TabItem *hideItem = [_tabAry objectAtIndex:_selectedIndex];
     TabItem *showItem = [_tabAry objectAtIndex:offset.x > selectedOffsetX ? _selectedIndex + 1 : _selectedIndex - 1];
     
-    CGFloat change = fabs(selectedOffsetX - offset.x) / WidthOf(_pageScroll);
+    CGFloat change = fabs(selectedOffsetX - offset.x) / _pageScroll.width;
     [hideItem gradualChangeTo:1 - change];
     [showItem gradualChangeTo:change];
 }
@@ -367,7 +371,7 @@
         visibleItemIndex--;
     }
     
-    [_pageScroll setContentOffset:CGPointMake(WidthOf(_pageScroll) * selectedIndex, 0) animated:NO];
+    [_pageScroll setContentOffset:CGPointMake(_pageScroll.width * selectedIndex, 0) animated:NO];
     
     if (_isTabScrollCanRoll) {
         [_tabScroll scrollRectToVisible:CGRectMake(_tabItemWidth * visibleItemIndex, 0, _tabItemWidth, _tabScrollHeight) animated:YES];
@@ -398,11 +402,15 @@
     [self resetPageScrollFrame:self.frame];
 }
 
+-(void)setPageScrollEnable:(BOOL)pageScrollEnable {
+    _pageScroll.scrollEnabled = pageScrollEnable;
+}
+
 #pragma mark - ScrollView Delegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (scrollView == _pageScroll) {
-        [_selectedLine setX:_selectedLineDiffX + scrollView.contentOffset.x * _tabItemWidth / WidthOf(_pageScroll)];
-        _selectedTempX = scrollView.contentOffset.x * _tabItemWidth / WidthOf(_pageScroll) + _selectLinePadding;
+        [_selectedLine setX:_selectedLineDiffX + scrollView.contentOffset.x * _tabItemWidth /_pageScroll.width];
+        _selectedTempX = scrollView.contentOffset.x * _tabItemWidth / _pageScroll.width + _selectLinePadding;
 
         [self handleGradualChangeWithContentOffset:scrollView.contentOffset];
     }
@@ -415,7 +423,7 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if (scrollView == _pageScroll) {
-        self.selectedIndex = scrollView.contentOffset.x / WidthOf(_pageScroll);
+        self.selectedIndex = scrollView.contentOffset.x / _pageScroll.width;
     }
 }
 
@@ -440,12 +448,16 @@
     NSInteger pageCount = _tabAry.count;
     
     _tabScroll.frame = CGRectMake(0, 0, frame.size.width, _tabScrollHeight);
-    _tabItemWidth = _isTabScrollCanRoll ? defaultTabIemWidth : WidthOf(_tabScroll) / pageCount;
-    _tabScroll.contentSize = CGSizeMake(_isTabScrollCanRoll ? _tabItemWidth * pageCount : WidthOf(_tabScroll), _tabScrollHeight);
+    if (_isTabScrollCanRoll && _delegate && [_delegate respondsToSelector:@selector(widthForTabInPageView:)]) {
+        _tabItemWidth = [_delegate widthForTabInPageView:self];
+    } else {
+        _tabItemWidth = _isTabScrollCanRoll ? defaultTabIemWidth : _tabScroll.width / pageCount;
+    }
+    _tabScroll.contentSize = CGSizeMake(_isTabScrollCanRoll ? _tabItemWidth * pageCount : _tabScroll.width, _tabScrollHeight);
     
     for (NSInteger index = 0; index < _tabAry.count; index++) {
         TabItem *tabItem = _tabAry[index];
-        tabItem.frame = CGRectMake(index * _tabItemWidth, 0, _tabItemWidth, HeightOf(_tabScroll));
+        tabItem.frame = CGRectMake(index * _tabItemWidth, 0, _tabItemWidth, _tabScroll.height);
     }
     
 }
@@ -458,11 +470,11 @@
 - (void)resetPageScrollFrame:(CGRect)frame
 {
     _pageScroll.frame = CGRectMake(0, _tabScrollHeight + _pageOffset, frame.size.width, frame.size.height - _tabScrollHeight - _pageOffset);
-    _pageScroll.contentSize = CGSizeMake(_pageAry.count * WidthOf(_pageScroll), HeightOf(_pageScroll));
+    _pageScroll.contentSize = CGSizeMake(_pageAry.count * _pageScroll.width, _pageScroll.height);
     
     for (NSInteger index = 0; index < _pageAry.count; index++) {
         UIView *contentView = _pageAry[index];
-        contentView.frame = CGRectMake(index * WidthOf(_pageScroll), 0, WidthOf(_pageScroll), HeightOf(_pageScroll));
+        contentView.frame = CGRectMake(index * _pageScroll.width, 0, _pageScroll.width, _pageScroll.height);
     }
 }
 

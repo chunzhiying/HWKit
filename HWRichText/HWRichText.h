@@ -20,7 +20,7 @@ typedef void(^TargetSelector)();
 
 @property (nonatomic) BOOL showInCenter; //auto offset to center in frame
 @property (nonatomic) BOOL scrollEnabled;
-@property (nonatomic) BOOL selectedHighlightEnabled; //highlight when selected, default: YES
+@property (nonatomic) BOOL selectedHighlightEnabled; //highlight when selected, default: >= iOS8 ? YES : NO
 
 @property (nonatomic) NSUInteger maxShowLine; //will reset frame.size.height, (NSUIntegerMax to get All content height.)
 

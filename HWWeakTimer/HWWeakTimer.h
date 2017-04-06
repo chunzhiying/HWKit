@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void(^TimerBlock)(NSDictionary *userInfo);
+typedef void(^TimerBlock)(NSDictionary * _Nullable userInfo);
 
 @interface HWWeakTimer : NSObject
 

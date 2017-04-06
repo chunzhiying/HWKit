@@ -12,8 +12,8 @@
 
 @protocol HWSelectable <NSObject>
 
-@property (nonatomic) NSUInteger index;
-@property (nonatomic) BOOL isSelected; //重写setter方法定制选中的样式
+@required @property (nonatomic) NSUInteger index;
+@optional @property (nonatomic) BOOL isSelected; //重写setter方法定制选中的样式
 
 @end
 
@@ -26,6 +26,8 @@
 - (CGFloat)paddingOfScrollTagView:(HWScrollTagView *)tagView; //default: 15
 - (CGFloat)spacingOfScrollTagView:(HWScrollTagView *)tagView; //default: 12
 - (void)scrollTagView:(HWScrollTagView *)scrollTagView didClickItem:(UIView<HWSelectable> *)item index:(NSUInteger)index;
+- (void)scrollTagViewDidScroll:(UIScrollView *)scrollView;
+- (void)scrollTagViewDidEndDecelerating:(UIScrollView *)scrollView;
 
 @end
 
@@ -34,7 +36,7 @@
 @property (nonatomic, weak) id<HWScrollTagDelegate> delegate;
 @property (nonatomic) NSUInteger seletedIndex;
 
-- (instancetype)initWithFrame:(CGRect)frame delegate:(id<HWScrollTagDelegate>)delegate;
+- (instancetype)initWithFrame:(CGRect)frame seperatorLineHidden:(BOOL)isHidden delegate:(id<HWScrollTagDelegate>)delegate;
 - (void)reloadData;
 
 @end

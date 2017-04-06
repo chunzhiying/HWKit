@@ -24,6 +24,7 @@
 
 @optional
 - (CGFloat)heightForTabInPageView:(HWPageView *)pageView; //default: 36
+- (CGFloat)widthForTabInPageView:(HWPageView *)pageView; //default: 80
 - (UIColor *)colorForTabBgInPageView:(HWPageView *)pageView; //default: [UIColor whiteColor]
 - (CGFloat)paddingForSelectedLineInPageView:(HWPageView *)pageView; //default: 10
 
@@ -45,11 +46,13 @@ typedef NS_ENUM(NSInteger, HWPageSelectedType){
 @property (nonatomic, weak) id<HWPageViewDelegate> delegate;
 
 @property (nonatomic, strong, readonly) UIView *selectedPage;
+@property (nonatomic, assign, readonly) NSInteger selectedIndex;
 
-@property (nonatomic) NSInteger selectedIndex;
 @property (nonatomic) CGFloat pageOffset; //pageView y offset
 
 @property (nonatomic, strong) UIColor *separateLineColor;
+
+@property (nonatomic, assign) BOOL pageScrollEnable;
 
 - (instancetype)initWithFrame:(CGRect)frame
       withTabTitleNormalColor:(UIColor *)normalColor
@@ -58,6 +61,7 @@ typedef NS_ENUM(NSInteger, HWPageSelectedType){
                  selectedType:(HWPageSelectedType)type
                      delegate:(id<HWPageViewDataSource, HWPageViewDelegate>)delegate;
 
+- (void)changePageToIndex:(NSInteger)index;
 - (void)reloadData;
 
 @end

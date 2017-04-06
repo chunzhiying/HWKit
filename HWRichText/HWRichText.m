@@ -117,7 +117,7 @@ if(atBlock) {\
     
     [_contentTxtView addGestureRecognizer:_contentTxtTap];
     [self addSubview:_contentTxtView];
-    self.selectedHighlightEnabled = YES;
+    self.selectedHighlightEnabled = [[UIDevice currentDevice].systemVersion floatValue] >= 8.0;
 }
 
 #pragma mark -
