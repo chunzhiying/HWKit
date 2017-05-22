@@ -26,4 +26,7 @@
 + (void)loading:(NSString *)text waiting:(NSTimeInterval)waitingTime timeOut:(void(^)())block;
 + (void)hide;
 
+#pragma mark Progress
++ (void)show:(NSString *)text progress:(CGFloat)progress;
+
 @end
