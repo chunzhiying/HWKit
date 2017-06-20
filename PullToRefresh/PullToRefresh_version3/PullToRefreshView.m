@@ -10,7 +10,7 @@
 #import "PullToRefreshView.h"
 #import "ColorUtil.h"
 #import "LoadMoreCell.h"
-#import "NetworkInfo.h"
+#import "ATNetworkInfo.h"
 #import "UICenter.h"
 #import "NetDisconnectView.h"
 #import "RefreshHeader_Macro.h"
@@ -33,7 +33,7 @@ typedef NS_ENUM(NSInteger,  QueryState) {
     QueryState_TimeOut
 };
 
-@interface PullToRefreshView() <UITableViewDelegate, UITableViewDataSource, NetDisconnectViewDelegate, LoadMoreCellDelegate> {
+@interface PullToRefreshView() <UITableViewDelegate, UITableViewDataSource, NetDisconnectViewDelegate, LoadMoreCellDelegate, CAAnimationDelegate> {
     
     RefreshHeader_DEC
     
@@ -131,6 +131,8 @@ typedef NS_ENUM(NSInteger,  QueryState) {
     _tableView.dataSource = self;
     [self addSubview:_tableView];
     
+    _autoUpdateFromBackground = YES;
+    
     for (UIView *subView in _tableView.subviews) {
         if ([subView isKindOfClass:[UIScrollView class]]) {
             [(UIScrollView *)subView setScrollsToTop:NO];
@@ -152,11 +154,21 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 - (void)checkIfNoContent:(NSInteger)dataCount {
     
     if (dataCount == 0 && _noContentView && !_showNoContentView) {
+        
         _showNoContentView = YES;
         _netDisconnectView.hidden = YES;
-        _tableView.tableHeaderView = nil;
-        _tableView.tableFooterView = nil;
         [self reloadData];
+        
+        if (!([_pullToRefreshDelegate respondsToSelector:@selector(canShowTableHeaderViewWhenNoContentInPullToRefresh:)]
+              && [_pullToRefreshDelegate canShowTableHeaderViewWhenNoContentInPullToRefresh:_tableView])) {
+            _tableView.tableHeaderView = nil;
+        }
+        
+        if (!([_pullToRefreshDelegate respondsToSelector:@selector(canShowTableFooterViewWhenNoContentInPullToRefresh:)]
+              && [_pullToRefreshDelegate canShowTableFooterViewWhenNoContentInPullToRefresh:_tableView])) {
+            _tableView.tableFooterView = nil;
+        }
+    
         return;
     }
     
@@ -240,7 +252,7 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 
 - (void)onAppEnterForegroundNotification:(NSNotification *)notification {
     
-    if (!_canRefresh) {
+    if (!_canRefresh || !_autoUpdateFromBackground) {
         return;
     }
     
@@ -320,7 +332,6 @@ typedef NS_ENUM(NSInteger,  QueryState) {
     _allowSimultaneousRecognition = allowSimultaneousRecognition;
     _tableView.allowSimultaneousRecognition = allowSimultaneousRecognition;
 }
-
 
 #pragma mark - RequestTimer method
 - (void)startTimer
@@ -436,6 +447,7 @@ typedef NS_ENUM(NSInteger,  QueryState) {
     [self autoRefresh];
 }
 
+
 #pragma mark - NetDisconnectView Delegate 
 - (void)retryConnect:(NetDisconnectView*)disconnectView withCompleted:(RetryResultBlock)block{
     self.netDisconnectBlock = block;
@@ -472,6 +484,7 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 #pragma mark - Scroll Delegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    self.contentOffset = scrollView.contentOffset;
     if ([_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:scrollViewDidScroll:)]) {
         [_pullToRefreshDelegate pullToRefresh:self scrollViewDidScroll:scrollView];
     }
@@ -523,6 +536,29 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
 
     _autoRefresh = scrollView.contentOffset.y == -AutoRefreshHeaderHeight;
+    
+    if ([_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:scrollViewDidEndScrollingAnimation:)]) {
+        [_pullToRefreshDelegate pullToRefresh:self scrollViewDidEndScrollingAnimation:scrollView];
+    }
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if ([_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:scrollViewWillBeginDragging:)]) {
+        [_pullToRefreshDelegate pullToRefresh:self scrollViewWillBeginDragging:scrollView];
+    }
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if ([_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:scrollViewDidEndDragging: willDecelerate:)]) {
+        [_pullToRefreshDelegate pullToRefresh:self scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if ([_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:scrollViewDidEndDecelerating:)]) {
+        [_pullToRefreshDelegate pullToRefresh:self scrollViewDidEndDecelerating:scrollView];
+    }
 }
 
 #pragma mark - Animation Delegate
@@ -578,6 +614,12 @@ typedef NS_ENUM(NSInteger,  QueryState) {
         [_pullToRefreshDelegate pullToRefresh:tableView didSelectRowAtIndexPath:indexPath];
     }
     
+}
+
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (_pullToRefreshDelegate && [_pullToRefreshDelegate respondsToSelector:@selector(pullToRefresh:didEndDisplayingCell:)]) {
+        [_pullToRefreshDelegate pullToRefresh:tableView didEndDisplayingCell:cell];
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -685,12 +727,12 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if (_showNoContentView || _pullToRefreshDelegate == nil) {
-        return nil;
+        return [UITableViewCell new];
     }
     
     if (_canLoadMore && indexPath.section == _sectionCount && indexPath.row == 0) {
         
-        if ([NetworkInfo sharedObject].networkState == NetworkStateNotReachable) {
+        if ([ATNetworkInfo sharedObject].networkState == ATNetworkStateNotReachable) {
             [self.loadMoreCell setLoadMoreType:NetworkNotReachable];
             return self.loadMoreCell;
         }
@@ -783,6 +825,11 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 
 @implementation PullToRefreshView (Addition)
 
+#pragma mark - VisibleCells
+- (NSArray*)visibleCells {
+    return [_tableView visibleCells];
+}
+
 #pragma mark -
 - (void)setTag:(NSInteger)tag {
     [super setTag:tag];
@@ -792,6 +839,10 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
     [super setBackgroundColor:backgroundColor];
     _tableView.backgroundColor = backgroundColor;
+}
+
+- (CGSize)contentSize {
+    return _tableView.contentSize;
 }
 
 #pragma mark ScrollToTop
@@ -887,6 +938,11 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated
 {
     [_tableView scrollToRowAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
+}
+
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated {
+    _contentOffset = contentOffset;
+    [_tableView setContentOffset:contentOffset animated:animated];
 }
 
 - (CGRect)rectForSection:(NSInteger)section {

@@ -17,6 +17,7 @@
     BOOL _seperatorLineHidden;
 }
 
+@property (nonatomic) NSUInteger seletedIndex;
 @property (nonatomic, strong) UIScrollView *scroll;
 @property (nonatomic, strong) UIView *seperatorView;
 
@@ -70,15 +71,27 @@
         _scroll.contentSize = CGSizeMake(totalWidth, self.bounds.size.height);
     }
     
+    __block CGFloat lastItemMaxX = 0;
     _items.mapWithIndex(^(UIView<HWSelectable> *item, NSUInteger index) {
         if ([item respondsToSelector:@selector(setIsSelected:)]) {
             [item addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickItem:)]];
             item.userInteractionEnabled = YES;
         }
         item.index = index;
+        
         item.frame = CGRectMake(index * (spacing + item.bounds.size.width) + padding,
                                 (self.bounds.size.height - item.bounds.size.height) / 2,
                                 item.bounds.size.width, item.bounds.size.height);
+        
+        if ([_delegate respondsToSelector:@selector(isFlexibleItemWidth)]) {
+            if ([_delegate isFlexibleItemWidth]) {
+                item.frame = CGRectMake( index * spacing + lastItemMaxX +  padding,
+                                        (self.bounds.size.height - item.bounds.size.height) / 2,
+                                        item.bounds.size.width, item.bounds.size.height);
+                lastItemMaxX += item.bounds.size.width;
+            }
+        }
+        
         [_scroll addSubview:item];
         return item;
     });
@@ -95,6 +108,10 @@
             [self addSubview:_seperatorView];
         }
     }
+}
+
+- (void)changePageToIndex:(NSInteger)index {
+    [self setSeletedIndex:index];
 }
 
 - (void)reloadData {
@@ -114,13 +131,19 @@
 }
 
 #pragma mark - scrollView_delegate
--(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if ([_delegate respondsToSelector:@selector(scrollTagViewDidScroll:)]) {
-        [_delegate scrollTagViewDidScroll:scrollView];
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if ([_delegate respondsToSelector:@selector(scrollTagViewWillBeginDragging:)]) {
+        [_delegate scrollTagViewWillBeginDragging:scrollView];
     }
 }
 
--(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if ([_delegate respondsToSelector:@selector(scrollTagViewDidEndDragging:willDecelerate:)]) {
+        [_delegate scrollTagViewDidEndDragging:scrollView willDecelerate:decelerate];
+    }
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if ([_delegate respondsToSelector:@selector(scrollTagViewDidEndDecelerating:)]) {
         [_delegate scrollTagViewDidEndDecelerating:scrollView];
     }
@@ -131,29 +154,34 @@
     if (!_items.count) {
         return;
     }
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(scrollTagView:didClickItem:index:)]) {
+        [_delegate scrollTagView:self didClickItem:[_items objectAtIndex:seletedIndex]
+                       index:seletedIndex];
+    }
+    
     _seletedIndex = seletedIndex;
     
     for (int i = 0; i < _items.count; i++) {
         UIView<HWSelectable> *item = [_items objectAtIndex:i];
         if (i == seletedIndex) {
             item.isSelected = YES;
-            if (_delegate && [_delegate respondsToSelector:@selector(scrollTagView:didClickItem:index:)]) {
-                [_delegate scrollTagView:self didClickItem:item index:item.index];
-            }
         } else {
             item.isSelected = NO;
         }
     }
+    
     UIView *subView = _items[seletedIndex];
     CGFloat subViewX = subView.frame.origin.x;
     CGFloat subViewW = subView.frame.size.width;
-    BOOL needScroll = subViewX + subViewW > ATScreenWidth ? YES : NO;
-    if (_scroll.contentSize.width > ATScreenWidth && needScroll) {
-        CGFloat contentX = subViewX - ATScreenWidth * 0.5 + subViewW * 0.5;
-        contentX = contentX < 0 ? 0 : contentX;
-        contentX = contentX + ATScreenWidth > _scroll.contentSize.width ? _scroll.contentSize.width - ATScreenWidth : contentX;
-        [_scroll setContentOffset:CGPointMake(contentX, 0) animated:NO];
-    }
+    CGFloat contentX = subViewX + subViewW / 2 - ATScreenWidth / 2;
+    contentX = MAX(0, MIN(contentX, _scroll.contentSize.width - ATScreenWidth));
+    [_scroll setContentOffset:CGPointMake(contentX, 0) animated:YES];
+}
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    [super setBackgroundColor:backgroundColor];
+    _scroll.backgroundColor = backgroundColor;
 }
 
 @end

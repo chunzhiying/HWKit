@@ -500,6 +500,10 @@ __strong __typeof(weakSelf) strongSelf = weakSelf;
 }
 
 #pragma mark - Action
+- (BOOL)isShowing {
+    return self.superview != nil;
+}
+
 - (void)show {
     
     UIWindow *parentView = [UIApplication sharedApplication].delegate.window;

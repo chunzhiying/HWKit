@@ -20,6 +20,7 @@
 @implementation LoadMoreCell
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     [_tipsActivity startAnimating];
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickSelf)];
     [self addGestureRecognizer:tap];

@@ -39,6 +39,8 @@ extern NSString * const onTabbarChangeNotification;
 - (UITableViewCell *)pullToRefresh:(UITableView *)pullTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 @optional
+- (NSInteger)numberOfSectionsInPullToRefresh:(UITableView *)pullTableView;
+
 - (UIView *)pullToRefresh:(UITableView *)pullTableView viewForFooterInSection:(NSInteger)section;
 - (UIView *)pullToRefresh:(UITableView *)pullTableView viewForHeaderInSection:(NSInteger)section;
 
@@ -46,13 +48,20 @@ extern NSString * const onTabbarChangeNotification;
 - (CGFloat)pullToRefresh:(UITableView *)pullTableView heightForFooterInSection:(NSInteger)section;
 - (CGFloat)pullToRefresh:(UITableView *)pullTableView heightForHeaderInSection:(NSInteger)section;
 
-- (NSInteger)numberOfSectionsInPullToRefresh:(UITableView *)pullTableView;
 - (void)pullToRefresh:(UITableView *)pullTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
-
+- (void)pullToRefresh:(UITableView *)pullTableView didEndDisplayingCell:(UITableViewCell *)cell;
 - (BOOL)pullToRefresh:(UITableView *)pullToRefresh canEditRowAtIndexPath:(NSIndexPath *)indexPath;
 - (void)pullToRefresh:(UITableView *)pullToRefresh commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath;
 
 - (void)pullToRefresh:(PullToRefreshView *)pullToRefresh scrollViewDidScroll:(UIScrollView *)scrollView;
+- (void)pullToRefresh:(PullToRefreshView *)pullToRefresh scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView;
+- (void)pullToRefresh:(PullToRefreshView *)pullToRefresh scrollViewWillBeginDragging:(UIScrollView *)scrollView;
+- (void)pullToRefresh:(PullToRefreshView *)pullToRefresh scrollViewDidEndDecelerating:(UIScrollView *)scrollView;
+- (void)pullToRefresh:(PullToRefreshView *)pullToRefresh scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;
+
+@optional
+- (BOOL)canShowTableHeaderViewWhenNoContentInPullToRefresh:(UITableView *)pullTableView;
+- (BOOL)canShowTableFooterViewWhenNoContentInPullToRefresh:(UITableView *)pullTableView;
 
 @end
 
@@ -64,7 +73,9 @@ extern NSString * const onTabbarChangeNotification;
 @property (nonatomic, weak) id<PullToRefreshTableViewDelegate> pullToRefreshDelegate;
 
 @property (nonatomic) UIEdgeInsets constrain;
+@property (nonatomic) CGPoint contentOffset;
 
+@property (nonatomic) BOOL autoUpdateFromBackground; //Default: YES, refresh the current pullToRefreshView when App enter foreground.
 @property (nonatomic) BOOL enableNetDisConnect;  //Default: YES, show disconnect view when network broken or without data.
 @property (nonatomic, strong) UIView *noContentView;  //Default: nil, set to replace disconnect view when without data.
 
@@ -94,6 +105,9 @@ extern NSString * const onTabbarChangeNotification;
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
 @property (nonatomic) BOOL showsVerticalScrollIndicator;
 
+@property (nonatomic, readonly) CGSize contentSize;
+@property (nonatomic, readonly) NSArray<__kindof UITableViewCell *> *visibleCells;
+
 - (void)beginUpdates;
 - (void)endUpdates;
 
@@ -106,6 +120,7 @@ extern NSString * const onTabbarChangeNotification;
 
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated;
 
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
 - (CGRect)rectForSection:(NSInteger)section;
 
 @end

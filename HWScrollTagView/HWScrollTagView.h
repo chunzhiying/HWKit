@@ -23,20 +23,28 @@
 - (NSArray<UIView<HWSelectable> *> *)contentViewsForScrollTagView:(HWScrollTagView *)tagView;
 
 @optional
+- (BOOL)isFlexibleItemWidth;
 - (CGFloat)paddingOfScrollTagView:(HWScrollTagView *)tagView; //default: 15
 - (CGFloat)spacingOfScrollTagView:(HWScrollTagView *)tagView; //default: 12
-- (void)scrollTagView:(HWScrollTagView *)scrollTagView didClickItem:(UIView<HWSelectable> *)item index:(NSUInteger)index;
-- (void)scrollTagViewDidScroll:(UIScrollView *)scrollView;
+
+- (void)scrollTagViewWillBeginDragging:(UIScrollView *)scrollView;
+- (void)scrollTagViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;
 - (void)scrollTagViewDidEndDecelerating:(UIScrollView *)scrollView;
+
+- (void)scrollTagView:(HWScrollTagView *)scrollTagView
+         didClickItem:(UIView<HWSelectable> *)item
+                index:(NSUInteger)index;
 
 @end
 
 @interface HWScrollTagView : UIView
 
 @property (nonatomic, weak) id<HWScrollTagDelegate> delegate;
-@property (nonatomic) NSUInteger seletedIndex;
+@property (nonatomic, readonly) NSUInteger seletedIndex;
 
 - (instancetype)initWithFrame:(CGRect)frame seperatorLineHidden:(BOOL)isHidden delegate:(id<HWScrollTagDelegate>)delegate;
+
+- (void)changePageToIndex:(NSInteger)index;
 - (void)reloadData;
 
 @end

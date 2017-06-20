@@ -63,6 +63,7 @@ typedef void(^AlertTextFieldConfigBlock)(NSInteger txtfieldIndex, UITextField * 
                      otherButtonsBlock:(nullable AlertOtherButtonsBlock)otherButtonsBlock;
 
 - (void)show;
+- (BOOL)isShowing;
 
 - (void)dismissWithCancelButtonClicked;
 - (void)dismissWithClickedButtonIndex:(NSInteger)index animated:(BOOL)animated;
