@@ -23,7 +23,8 @@
         return parentView.subviews.lastObject;
     }
     
-    NetDisconnectView *disconnectView = [[[NSBundle mainBundle] loadNibNamed:@"NetDisconnectView" owner:nil options:nil] objectAtIndex:0];
+    NSBundle *bundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"HWKitBundle" ofType:@"bundle"]];
+    NetDisconnectView *disconnectView = [[bundle loadNibNamed:@"NetDisconnectView" owner:nil options:nil] objectAtIndex:0];
     
     disconnectView.frame = parentView.bounds;
     disconnectView.delegate = delegate;

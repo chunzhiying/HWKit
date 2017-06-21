@@ -4,25 +4,15 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>HWKit.xcscheme</key>
+		<key>Demo.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
-		</dict>
-		<key>HWKitBundle.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>0</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>984CCA161EFA203A005C5658</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>98DA81A01EFA8A0400CE3540</key>
+		<key>98DA81791EFA88EC00CE3540</key>
 		<dict>
 			<key>primary</key>
 			<true/>
