@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" restorationIdentifier="NetDisconnectView" id="iN0-l3-epB" customClass="NetDisconnectView">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="384"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WqB-Yg-DUd">
+                    <rect key="frame" x="171" y="177" width="58" height="30"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="58" id="SeZ-mL-eZa"/>
+                        <constraint firstAttribute="height" constant="30" id="mwL-xV-xIV"/>
+                    </constraints>
+                    <state key="normal" title="请重试"/>
+                    <connections>
+                        <action selector="retryButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="mgZ-jZ-RI4"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="加载失败" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RcB-lB-vXX">
+                    <rect key="frame" x="53" y="181" width="114" height="21"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="9HF-kO-7pf"/>
+                        <constraint firstAttribute="width" constant="114" id="CxX-jR-BoM"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_fail" translatesAutoresizingMaskIntoConstraints="NO" id="aQy-7w-Be6" userLabel="failImage">
+                    <rect key="frame" x="135" y="119" width="50" height="50"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="50" id="OXO-TA-kpt"/>
+                        <constraint firstAttribute="height" constant="50" id="UyT-JN-mlg"/>
+                    </constraints>
+                </imageView>
+                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="重新请求中 请稍后.." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rLC-VD-20u">
+                    <rect key="frame" x="94" y="182.5" width="132.5" height="18"/>
+                    <animations/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <animations/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="WqB-Yg-DUd" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="40" id="1tx-PN-qfB"/>
+                <constraint firstItem="aQy-7w-Be6" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="2sp-DJ-y4E"/>
+                <constraint firstItem="WqB-Yg-DUd" firstAttribute="top" secondItem="aQy-7w-Be6" secondAttribute="bottom" constant="8" id="UQ0-2D-T0P"/>
+                <constraint firstItem="RcB-lB-vXX" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-50" id="Xxg-de-hXo"/>
+                <constraint firstItem="WqB-Yg-DUd" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="auF-dw-98g"/>
+                <constraint firstItem="rLC-VD-20u" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="h6G-tt-SEm"/>
+                <constraint firstItem="rLC-VD-20u" firstAttribute="centerY" secondItem="RcB-lB-vXX" secondAttribute="centerY" id="hZw-00-ifZ"/>
+                <constraint firstItem="RcB-lB-vXX" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="i1Q-bN-aYd"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="_requestingTips" destination="rLC-VD-20u" id="R61-pi-koE"/>
+            </connections>
+            <point key="canvasLocation" x="183" y="161"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="icon_fail" width="40" height="40"/>
+    </resources>
+</document>

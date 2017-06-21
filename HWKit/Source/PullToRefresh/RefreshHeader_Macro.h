@@ -35,7 +35,7 @@
 do {\
         tipsLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.frame.size.width/2 - 20, 0, self.frame.size.width/2 - 20, RefreshHeaderHeight)];\
         tipsLabel.font = [UIFont systemFontOfSize:13.0f];\
-        tipsLabel.textColor = [ColorUtil colorWithRGBA:0xa5a5a5ff];\
+        tipsLabel.textColor = DefaultLightGrayColor;\
 \
         refreshKLine = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_kLine"]];\
         refreshKLine.frame = CGRectMake(tipsLabel.frame.origin.x - 35, (RefreshHeaderHeight - 10)/2, 23, 10);\

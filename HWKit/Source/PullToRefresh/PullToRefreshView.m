@@ -8,10 +8,9 @@
 
 
 #import "PullToRefreshView.h"
-#import "ColorUtil.h"
 #import "LoadMoreCell.h"
 #import "ATNetworkInfo.h"
-#import "UICenter.h"
+#import "HWHelper.h"
 #import "NetDisconnectView.h"
 #import "RefreshHeader_Macro.h"
 #import "PullToRefreshCustomTable.h"
@@ -252,25 +251,25 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 
 - (void)onAppEnterForegroundNotification:(NSNotification *)notification {
     
-    if (!_canRefresh || !_autoUpdateFromBackground) {
-        return;
-    }
-    
-    for (id next = _pullToRefreshDelegate; next; next = [next nextResponder]) {
-            
-        if ([next isKindOfClass:[UIViewController class]] && [(UIViewController *)next navigationController]) {
-            
-            if ([[UICenter sharedObject] getCurrentNavigation] != [(UIViewController *)next navigationController]) {
-                return;
-            }
-            
-            if ([[UICenter sharedObject] getCurrentViewController] == next) {
-                [self autoRefresh];
-                return;
-            }
-            
-        }
-    }
+//    if (!_canRefresh || !_autoUpdateFromBackground) {
+//        return;
+//    }
+//    
+//    for (id next = _pullToRefreshDelegate; next; next = [next nextResponder]) {
+//            
+//        if ([next isKindOfClass:[UIViewController class]] && [(UIViewController *)next navigationController]) {
+//            
+//            if ([[UICenter sharedObject] getCurrentNavigation] != [(UIViewController *)next navigationController]) {
+//                return;
+//            }
+//            
+//            if ([[UICenter sharedObject] getCurrentViewController] == next) {
+//                [self autoRefresh];
+//                return;
+//            }
+//            
+//        }
+//    }
 }
 
 - (void)onTabbarChangeNotification:(NSNotification *)notification {
@@ -393,16 +392,16 @@ typedef NS_ENUM(NSInteger,  QueryState) {
         
         _refreshQueryState = QueryState_Quering;
         
-        ATWeakSelf
+        ATWeakify(self)
         [_refreshDelegate pullToRefresh:self refreshData:^(BOOL success) {
             
-            ATStrongSelfWithEnsureWeakSelf
-            if (strongSelf.netDisconnectBlock) {
-                strongSelf.netDisconnectBlock();
-                strongSelf.netDisconnectBlock = nil;
+            ATStrongifyEnsure(self)
+            if (self.netDisconnectBlock) {
+                self.netDisconnectBlock();
+                self.netDisconnectBlock = nil;
             }
             
-            strongSelf.refreshQueryState = success ? QueryState_Success : QueryState_Failed;
+            self.refreshQueryState = success ? QueryState_Success : QueryState_Failed;
         }];
     }
 }
@@ -459,14 +458,14 @@ typedef NS_ENUM(NSInteger,  QueryState) {
     _loadMoreQueryState = QueryState_Quering;
     [self.loadMoreCell setLoadMoreType:CanLoadMore];
     
-    ATWeakSelf
-    [_loadMoreDelegate pullToRefresh:weakSelf loadMoreData:^(BOOL success) {
-        ATStrongSelfWithEnsureWeakSelf
+    ATWeakify(self)
+    [_loadMoreDelegate pullToRefresh:self loadMoreData:^(BOOL success) {
+        ATStrongifyEnsure(self)
         if (success) {
-            strongSelf.loadMoreQueryState = QueryState_Success;
+            self.loadMoreQueryState = QueryState_Success;
         } else {
-            strongSelf.loadMoreQueryState = QueryState_Failed;
-            [strongSelf.loadMoreCell setLoadMoreType:ClickToReload];
+            self.loadMoreQueryState = QueryState_Failed;
+            [self.loadMoreCell setLoadMoreType:ClickToReload];
         }
     }];
 

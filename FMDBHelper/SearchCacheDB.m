@@ -7,34 +7,14 @@
 //
 
 #import "SearchCacheDB.h"
-#import "FMDatabaseAsyncQueue.h"
 #import "ATAppUtils.h"
 #import "ATGlobalMacro.h"
 #import "SearchFromInternetModel.h"
-#import "FMDatabaseAdditions.h"
 #import "HWFunctionalType.h"
+#import "FMDatabaseModel.h"
 
 const static int schmeaVersionHistory[] = {1};
 #define LATEST_VERSION (schmeaVersionHistory[sizeof(schmeaVersionHistory) / sizeof(schmeaVersionHistory[0]) - 1])
-
-@interface FMResultSet (SafeGet)
-
-- (id)safeObjectForColumnName:(NSString *)name;
-
-@end
-
-@implementation FMResultSet (SafeGet)
-
-- (id)safeObjectForColumnName:(NSString *)name {
-    NSObject *object = [self objectForColumnName:name];
-    if ([object isKindOfClass:[NSNull class]]) {
-        return nil;
-    } else {
-        return object;
-    }
-}
-
-@end
 
 @interface SearchCacheDB ()
 {
@@ -48,61 +28,16 @@ const static int schmeaVersionHistory[] = {1};
 {
     self = [super init];
     if (self) {
-        NSString *path = [NSString stringWithFormat:@"%@/SearchCacheDB.db",[ATAppUtils appDocumentPath]];
-        _fmdbQueue = [FMDatabaseAsyncQueue databaseQueueWithPath:path];
-        
-        [_fmdbQueue syncInTransaction:^(FMDatabase *db, BOOL *rollback) {
-            do {
-                *rollback = NO;
-                FMResultSet *resultSet = [db executeQuery:@"pragma user_version"];
-                if (![resultSet next]) {
-                    ATLogError(@"SearchCacheDBTag", @"%@",@"Faile to qurey the public db storage version");
-                    break;
-                }
-                int currentVersion = [resultSet intForColumnIndex:0];
-                [resultSet close];
-                if (currentVersion >= LATEST_VERSION) {
-                    break;
-                }
-                
-                *rollback = YES;
-                BOOL result = YES;
-                
-                for(int i = 0; i < (sizeof(schmeaVersionHistory)/sizeof(schmeaVersionHistory[0])); i++ ) {
-                    if (currentVersion >= (schmeaVersionHistory[i])){
-                        continue;
-                    }
-                    switch (schmeaVersionHistory[i]) {
-                        case 1:
-                            result = [self upgradeToVersion:db];
-                            break;
-                            
-                        default:
-                            result = NO;
-                            break;
-                    }
-                    if (!result) {
-                        ATLogError(@"SearchCacheDBTag", @"Failed to upgrade the public db storage to version %d", schmeaVersionHistory[i]);
-                        break;
-                    }
-                }
-                if (!result)
-                    break;
-                
-                NSString *sql = [NSString stringWithFormat:@"pragma user_version = %d", LATEST_VERSION];
-                if(![db executeUpdate:sql]) {
-                    ATLogError(@"SearchCacheDBTag", @"Failed to update the public db storage version to %d, error:%@", LATEST_VERSION, [db lastError]);
-                    break;
-                }
-                *rollback = NO;
-            } while (NO);
-        }];
-
+        _fmdbQueue = [FMDatabaseModel getQueueByName:@"SearchCacheDB"
+                                       latestVersion:LATEST_VERSION
+                                      updateCallback:^(FMDatabase *db, int oldVersion) {
+                                          return [self upgradeToVersion:db];
+                                      }];
     }
     return self;
 }
 
-- (BOOL)upgradeToVersion:(FMDatabase*)db
+- (BOOL)upgradeToVersion:(FMDatabase *)db
 {
     NSString *channel = @"CREATE TABLE IF NOT EXISTS t_channels (id integer PRIMARY KEY,\
     shortId text,\
@@ -119,13 +54,8 @@ const static int schmeaVersionHistory[] = {1};
     url text,\
     portaitId integer,\
     type integer)";
-    
-    if (![db executeUpdate:channel] || ![db executeUpdate:teacher]) {
-        ATLogError(@"SearchCacheDBTag", @"Failed to create table messages, error:%@", [db lastError]);
-        return NO;
-    }
 
-    return YES;
+    return ([db executeUpdate:channel] && [db executeUpdate:teacher]);
 }
 
 - (void)removeAll

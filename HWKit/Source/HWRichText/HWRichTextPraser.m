@@ -7,10 +7,6 @@
 //
 
 #import "HWRichTextPraser.h"
-#import "ColorUtil.h"
-#import "HWFunctionalType.h"
-#import "UICenter.h"
-#import "ATGlobalMacro.h"
 
 @implementation HWStockCodePraser
 
@@ -20,12 +16,12 @@
 
 - (void)onMactchedWithText:(NSString *)text inRichText:(HWRichText *)richText {
    
-    [richText setSelectorTextColor:DefaultTintColor];
+//    [richText setSelectorTextColor:DefaultTintColor];
    
     NSString *stock = [text substringWithRange:NSMakeRange(1, text.length - 2)];
     NSArray *ary = [[stock componentsSeparatedByString:@")"].firstObject componentsSeparatedByString:@"("];
     richText.insertStrAction(text, ^{
-        [[UICenter sharedObject] pushStockDetailViewCtlWithStockCode:ary.lastObject stockCnName:ary.firstObject];
+        
     });
 }
 

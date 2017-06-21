@@ -12,7 +12,6 @@
 @class SearchChannelData;
 @class SearchTeacherData;
 
-
 @interface SearchCacheDB : NSObject
 
 - (void)saveChannels:(NSArray<SearchChannelData *> *)datas;

@@ -7,8 +7,7 @@
 //
 
 #import "HWScrollTagView.h"
-#import "NSArray+FunctionalType.h"
-#import "ColorUtil.h"
+#import "HWHelper.h"
 
 @interface HWScrollTagView ()<UIScrollViewDelegate> {
     CGFloat _padding;
@@ -57,9 +56,11 @@
     CGFloat padding = _padding;
     CGFloat spacing = _spacing;
     
-    CGFloat totalItemWidth = [_items.reduce(@0, ^(NSNumber *result, UIView *item) {
-        return @([result floatValue] + item.bounds.size.width);
-    }) floatValue];
+    CGFloat totalItemWidth = 0;
+    for (UIView *item in _items) {
+        totalItemWidth += item.width;
+    }
+    
     CGFloat totalWidth = totalItemWidth + (_items.count - 1) * spacing + 2 * padding;
     
     if (self.bounds.size.width >= totalWidth) {
@@ -71,8 +72,10 @@
         _scroll.contentSize = CGSizeMake(totalWidth, self.bounds.size.height);
     }
     
-    __block CGFloat lastItemMaxX = 0;
-    _items.mapWithIndex(^(UIView<HWSelectable> *item, NSUInteger index) {
+    
+    CGFloat lastItemMaxX = 0;
+    for (NSUInteger index = 0; index < _items.count; index++) {
+        UIView<HWSelectable> *item = [_items objectAtIndex:index];
         if ([item respondsToSelector:@selector(setIsSelected:)]) {
             [item addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickItem:)]];
             item.userInteractionEnabled = YES;
@@ -93,8 +96,7 @@
         }
         
         [_scroll addSubview:item];
-        return item;
-    });
+    }
     
     [self addSubview:_scroll];
     

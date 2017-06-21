@@ -7,7 +7,6 @@
 //
 
 #import "HWDrawerViewCell.h"
-#import "ColorUtil.h"
 
 @interface HWDrawerViewCell ()
 
@@ -29,7 +28,7 @@
 
 - (void)setUITitle:(NSString *)title isSelected:(BOOL)selected {
     _title.text = title;
-    _title.textColor = selected ? DefaultTintColor : DefaultGrayTextColor;
+//    _title.textColor = selected ? DefaultTintColor : DefaultGrayTextColor;
     _confirmImg.hidden = !selected;
 }
 
