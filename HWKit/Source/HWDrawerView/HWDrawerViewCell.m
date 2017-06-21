@@ -7,6 +7,7 @@
 //
 
 #import "HWDrawerViewCell.h"
+#import "HWHelper.h"
 
 @interface HWDrawerViewCell ()
 
@@ -23,12 +24,13 @@
 }
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     self.selectionStyle = UITableViewCellSelectionStyleNone;
 }
 
 - (void)setUITitle:(NSString *)title isSelected:(BOOL)selected {
     _title.text = title;
-//    _title.textColor = selected ? DefaultTintColor : DefaultGrayTextColor;
+    _title.textColor = selected ? DefaultTintColor : DefaultGrayTextColor;
     _confirmImg.hidden = !selected;
 }
 

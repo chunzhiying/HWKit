@@ -57,6 +57,7 @@
                 [self requestRetry];
             }
             break;
+        default: break;
     }
 }
 

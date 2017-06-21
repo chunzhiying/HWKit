@@ -7,6 +7,7 @@
 //
 
 #import "HWRichTextPraser.h"
+#import "HWHelper.h"
 
 @implementation HWStockCodePraser
 
@@ -16,13 +17,13 @@
 
 - (void)onMactchedWithText:(NSString *)text inRichText:(HWRichText *)richText {
    
-//    [richText setSelectorTextColor:DefaultTintColor];
+    [richText setSelectorTextColor:DefaultTintColor];
    
-    NSString *stock = [text substringWithRange:NSMakeRange(1, text.length - 2)];
-    NSArray *ary = [[stock componentsSeparatedByString:@")"].firstObject componentsSeparatedByString:@"("];
-    richText.insertStrAction(text, ^{
-        
-    });
+//    NSString *stock = [text substringWithRange:NSMakeRange(1, text.length - 2)];
+//    NSArray *ary = [[stock componentsSeparatedByString:@")"].firstObject componentsSeparatedByString:@"("];
+//    richText.insertStrAction(text, ^{
+//        
+//    });
 }
 
 @end

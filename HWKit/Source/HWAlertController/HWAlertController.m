@@ -7,7 +7,6 @@
 //
 
 #import "HWAlertController.h"
-#import "HWFunctionalType.h"
 #import <objc/runtime.h>
 
 #define isIOS8 ([[UIDevice currentDevice].systemVersion floatValue] >= 8.0)
@@ -668,25 +667,26 @@ __strong __typeof(weakSelf) strongSelf = weakSelf;
             
             bgView.frame = CGRectMake(0, 0, MaxImageWidth, image.size.height + font.lineHeight + 3 * Spacing);
             
-            [bgView addSubview:[UILabel new].then(^(UILabel *label) {
-                label.font = font;
-                label.text = message;
-                label.textAlignment = NSTextAlignmentCenter;
-                label.frame = CGRectMake(Spacing, bgView.frame.size.height - font.lineHeight - Spacing,
-                                         MaxImageWidth - Spacing * 2, font.lineHeight);
-                label.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-            })];
+            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(Spacing,
+                                                                       bgView.frame.size.height - font.lineHeight - Spacing,
+                                                                       MaxImageWidth - Spacing * 2, font.lineHeight)];
+            label.font = font;
+            label.text = message;
+            label.textAlignment = NSTextAlignmentCenter;
+            label.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
             
+            [bgView addSubview:label];
             
         } else {
             bgView.frame = CGRectMake(0, 0, MaxImageWidth, image.size.height + 2 * Spacing);
         }
         
-        [bgView addSubview:[UIImageView new].then(^(UIImageView *imageView) {
-            imageView.image = image;
-            imageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-            imageView.frame = CGRectMake((MaxImageWidth - image.size.width) / 2, Spacing, image.size.width, image.size.height);
-        })];
+
+        UIImageView *imageView = [UIImageView new];
+        imageView.image = image;
+        imageView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+        imageView.frame = CGRectMake((MaxImageWidth - image.size.width) / 2, Spacing, image.size.width, image.size.height);
+        [bgView addSubview:imageView];
         
         [_alert setValue:bgView forKey:@"accessoryView"];
         [_alert.layer setValue:ImageTitleFlag forKey:ImageTitleFlag];

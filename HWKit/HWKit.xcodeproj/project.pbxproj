@@ -1,0 +1,435 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		98DA7EFE1EFA497D00CE3540 /* HWAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7ED41EFA497D00CE3540 /* HWAlertController.m */; };
+		98DA7EFF1EFA497D00CE3540 /* HWDrawerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7ED71EFA497D00CE3540 /* HWDrawerView.m */; };
+		98DA7F001EFA497D00CE3540 /* HWDrawerViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7ED91EFA497D00CE3540 /* HWDrawerViewCell.m */; };
+		98DA7F011EFA497D00CE3540 /* HWGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EDE1EFA497D00CE3540 /* HWGrowingTextView.m */; };
+		98DA7F021EFA497D00CE3540 /* HWHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EE01EFA497D00CE3540 /* HWHelper.m */; };
+		98DA7F031EFA497D00CE3540 /* HWPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EE31EFA497D00CE3540 /* HWPageView.m */; };
+		98DA7F041EFA497D00CE3540 /* HWRichText.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EE61EFA497D00CE3540 /* HWRichText.m */; };
+		98DA7F051EFA497D00CE3540 /* HWRichTextPraser.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EE81EFA497D00CE3540 /* HWRichTextPraser.m */; };
+		98DA7F061EFA497D00CE3540 /* HWScrollTagView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EEB1EFA497D00CE3540 /* HWScrollTagView.m */; };
+		98DA7F071EFA497D00CE3540 /* HWWeakTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EEE1EFA497D00CE3540 /* HWWeakTimer.m */; };
+		98DA7F081EFA497D00CE3540 /* LoadMoreCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EF11EFA497D00CE3540 /* LoadMoreCell.m */; };
+		98DA7F091EFA497D00CE3540 /* ATNetworkInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EF51EFA497D00CE3540 /* ATNetworkInfo.m */; };
+		98DA7F0A1EFA497D00CE3540 /* NetDisconnectView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EF71EFA497D00CE3540 /* NetDisconnectView.m */; };
+		98DA7F0B1EFA497D00CE3540 /* PullToRefreshCustomTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EFA1EFA497D00CE3540 /* PullToRefreshCustomTable.m */; };
+		98DA7F0C1EFA497D00CE3540 /* PullToRefreshView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA7EFC1EFA497D00CE3540 /* PullToRefreshView.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		984CCA151EFA203A005C5658 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		984CCA171EFA203A005C5658 /* libHWKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHWKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		98DA7ED31EFA497D00CE3540 /* HWAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWAlertController.h; sourceTree = "<group>"; };
+		98DA7ED41EFA497D00CE3540 /* HWAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWAlertController.m; sourceTree = "<group>"; };
+		98DA7ED61EFA497D00CE3540 /* HWDrawerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWDrawerView.h; sourceTree = "<group>"; };
+		98DA7ED71EFA497D00CE3540 /* HWDrawerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWDrawerView.m; sourceTree = "<group>"; };
+		98DA7ED81EFA497D00CE3540 /* HWDrawerViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWDrawerViewCell.h; sourceTree = "<group>"; };
+		98DA7ED91EFA497D00CE3540 /* HWDrawerViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWDrawerViewCell.m; sourceTree = "<group>"; };
+		98DA7EDA1EFA497D00CE3540 /* HWDrawerViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HWDrawerViewCell.xib; sourceTree = "<group>"; };
+		98DA7EDD1EFA497D00CE3540 /* HWGrowingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWGrowingTextView.h; sourceTree = "<group>"; };
+		98DA7EDE1EFA497D00CE3540 /* HWGrowingTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWGrowingTextView.m; sourceTree = "<group>"; };
+		98DA7EDF1EFA497D00CE3540 /* HWHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWHelper.h; sourceTree = "<group>"; };
+		98DA7EE01EFA497D00CE3540 /* HWHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWHelper.m; sourceTree = "<group>"; };
+		98DA7EE21EFA497D00CE3540 /* HWPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWPageView.h; sourceTree = "<group>"; };
+		98DA7EE31EFA497D00CE3540 /* HWPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWPageView.m; sourceTree = "<group>"; };
+		98DA7EE51EFA497D00CE3540 /* HWRichText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWRichText.h; sourceTree = "<group>"; };
+		98DA7EE61EFA497D00CE3540 /* HWRichText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWRichText.m; sourceTree = "<group>"; };
+		98DA7EE71EFA497D00CE3540 /* HWRichTextPraser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWRichTextPraser.h; sourceTree = "<group>"; };
+		98DA7EE81EFA497D00CE3540 /* HWRichTextPraser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWRichTextPraser.m; sourceTree = "<group>"; };
+		98DA7EEA1EFA497D00CE3540 /* HWScrollTagView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWScrollTagView.h; sourceTree = "<group>"; };
+		98DA7EEB1EFA497D00CE3540 /* HWScrollTagView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWScrollTagView.m; sourceTree = "<group>"; };
+		98DA7EED1EFA497D00CE3540 /* HWWeakTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWeakTimer.h; sourceTree = "<group>"; };
+		98DA7EEE1EFA497D00CE3540 /* HWWeakTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWWeakTimer.m; sourceTree = "<group>"; };
+		98DA7EF01EFA497D00CE3540 /* LoadMoreCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadMoreCell.h; sourceTree = "<group>"; };
+		98DA7EF11EFA497D00CE3540 /* LoadMoreCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadMoreCell.m; sourceTree = "<group>"; };
+		98DA7EF21EFA497D00CE3540 /* LoadMoreCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoadMoreCell.xib; sourceTree = "<group>"; };
+		98DA7EF41EFA497D00CE3540 /* ATNetworkInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATNetworkInfo.h; sourceTree = "<group>"; };
+		98DA7EF51EFA497D00CE3540 /* ATNetworkInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATNetworkInfo.m; sourceTree = "<group>"; };
+		98DA7EF61EFA497D00CE3540 /* NetDisconnectView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetDisconnectView.h; sourceTree = "<group>"; };
+		98DA7EF71EFA497D00CE3540 /* NetDisconnectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetDisconnectView.m; sourceTree = "<group>"; };
+		98DA7EF81EFA497D00CE3540 /* NetDisconnectView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NetDisconnectView.xib; sourceTree = "<group>"; };
+		98DA7EF91EFA497D00CE3540 /* PullToRefreshCustomTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullToRefreshCustomTable.h; sourceTree = "<group>"; };
+		98DA7EFA1EFA497D00CE3540 /* PullToRefreshCustomTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullToRefreshCustomTable.m; sourceTree = "<group>"; };
+		98DA7EFB1EFA497D00CE3540 /* PullToRefreshView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullToRefreshView.h; sourceTree = "<group>"; };
+		98DA7EFC1EFA497D00CE3540 /* PullToRefreshView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullToRefreshView.m; sourceTree = "<group>"; };
+		98DA7EFD1EFA497D00CE3540 /* RefreshHeader_Macro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefreshHeader_Macro.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		984CCA141EFA203A005C5658 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		984CCA0E1EFA203A005C5658 = {
+			isa = PBXGroup;
+			children = (
+				98DA7ED11EFA497D00CE3540 /* Source */,
+				984CCA181EFA203A005C5658 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		984CCA181EFA203A005C5658 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				984CCA171EFA203A005C5658 /* libHWKit.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		98DA7ED11EFA497D00CE3540 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7ED21EFA497D00CE3540 /* HWAlertController */,
+				98DA7ED51EFA497D00CE3540 /* HWDrawerView */,
+				98DA7EDB1EFA497D00CE3540 /* HWGradualChangeHeaderView */,
+				98DA7EDC1EFA497D00CE3540 /* HWGrowingTextView */,
+				98DA7EDF1EFA497D00CE3540 /* HWHelper.h */,
+				98DA7EE01EFA497D00CE3540 /* HWHelper.m */,
+				98DA7EE11EFA497D00CE3540 /* HWPageView */,
+				98DA7EE41EFA497D00CE3540 /* HWRichText */,
+				98DA7EE91EFA497D00CE3540 /* HWScrollTagView */,
+				98DA7EEC1EFA497D00CE3540 /* HWWeakTimer */,
+				98DA7EEF1EFA497D00CE3540 /* PullToRefresh */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		98DA7ED21EFA497D00CE3540 /* HWAlertController */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7ED31EFA497D00CE3540 /* HWAlertController.h */,
+				98DA7ED41EFA497D00CE3540 /* HWAlertController.m */,
+			);
+			path = HWAlertController;
+			sourceTree = "<group>";
+		};
+		98DA7ED51EFA497D00CE3540 /* HWDrawerView */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7ED61EFA497D00CE3540 /* HWDrawerView.h */,
+				98DA7ED71EFA497D00CE3540 /* HWDrawerView.m */,
+				98DA7ED81EFA497D00CE3540 /* HWDrawerViewCell.h */,
+				98DA7ED91EFA497D00CE3540 /* HWDrawerViewCell.m */,
+				98DA7EDA1EFA497D00CE3540 /* HWDrawerViewCell.xib */,
+			);
+			path = HWDrawerView;
+			sourceTree = "<group>";
+		};
+		98DA7EDB1EFA497D00CE3540 /* HWGradualChangeHeaderView */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = HWGradualChangeHeaderView;
+			sourceTree = "<group>";
+		};
+		98DA7EDC1EFA497D00CE3540 /* HWGrowingTextView */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7EDD1EFA497D00CE3540 /* HWGrowingTextView.h */,
+				98DA7EDE1EFA497D00CE3540 /* HWGrowingTextView.m */,
+			);
+			path = HWGrowingTextView;
+			sourceTree = "<group>";
+		};
+		98DA7EE11EFA497D00CE3540 /* HWPageView */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7EE21EFA497D00CE3540 /* HWPageView.h */,
+				98DA7EE31EFA497D00CE3540 /* HWPageView.m */,
+			);
+			path = HWPageView;
+			sourceTree = "<group>";
+		};
+		98DA7EE41EFA497D00CE3540 /* HWRichText */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7EE51EFA497D00CE3540 /* HWRichText.h */,
+				98DA7EE61EFA497D00CE3540 /* HWRichText.m */,
+				98DA7EE71EFA497D00CE3540 /* HWRichTextPraser.h */,
+				98DA7EE81EFA497D00CE3540 /* HWRichTextPraser.m */,
+			);
+			path = HWRichText;
+			sourceTree = "<group>";
+		};
+		98DA7EE91EFA497D00CE3540 /* HWScrollTagView */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7EEA1EFA497D00CE3540 /* HWScrollTagView.h */,
+				98DA7EEB1EFA497D00CE3540 /* HWScrollTagView.m */,
+			);
+			path = HWScrollTagView;
+			sourceTree = "<group>";
+		};
+		98DA7EEC1EFA497D00CE3540 /* HWWeakTimer */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7EED1EFA497D00CE3540 /* HWWeakTimer.h */,
+				98DA7EEE1EFA497D00CE3540 /* HWWeakTimer.m */,
+			);
+			path = HWWeakTimer;
+			sourceTree = "<group>";
+		};
+		98DA7EEF1EFA497D00CE3540 /* PullToRefresh */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7EF01EFA497D00CE3540 /* LoadMoreCell.h */,
+				98DA7EF11EFA497D00CE3540 /* LoadMoreCell.m */,
+				98DA7EF21EFA497D00CE3540 /* LoadMoreCell.xib */,
+				98DA7EF31EFA497D00CE3540 /* NetDisconnectView */,
+				98DA7EF91EFA497D00CE3540 /* PullToRefreshCustomTable.h */,
+				98DA7EFA1EFA497D00CE3540 /* PullToRefreshCustomTable.m */,
+				98DA7EFB1EFA497D00CE3540 /* PullToRefreshView.h */,
+				98DA7EFC1EFA497D00CE3540 /* PullToRefreshView.m */,
+				98DA7EFD1EFA497D00CE3540 /* RefreshHeader_Macro.h */,
+			);
+			path = PullToRefresh;
+			sourceTree = "<group>";
+		};
+		98DA7EF31EFA497D00CE3540 /* NetDisconnectView */ = {
+			isa = PBXGroup;
+			children = (
+				98DA7EF41EFA497D00CE3540 /* ATNetworkInfo.h */,
+				98DA7EF51EFA497D00CE3540 /* ATNetworkInfo.m */,
+				98DA7EF61EFA497D00CE3540 /* NetDisconnectView.h */,
+				98DA7EF71EFA497D00CE3540 /* NetDisconnectView.m */,
+				98DA7EF81EFA497D00CE3540 /* NetDisconnectView.xib */,
+			);
+			path = NetDisconnectView;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		984CCA161EFA203A005C5658 /* HWKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 984CCA201EFA203A005C5658 /* Build configuration list for PBXNativeTarget "HWKit" */;
+			buildPhases = (
+				984CCA131EFA203A005C5658 /* Sources */,
+				984CCA141EFA203A005C5658 /* Frameworks */,
+				984CCA151EFA203A005C5658 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HWKit;
+			productName = HWKit;
+			productReference = 984CCA171EFA203A005C5658 /* libHWKit.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		984CCA0F1EFA203A005C5658 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = YY;
+				TargetAttributes = {
+					984CCA161EFA203A005C5658 = {
+						CreatedOnToolsVersion = 8.3.3;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 984CCA121EFA203A005C5658 /* Build configuration list for PBXProject "HWKit" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 984CCA0E1EFA203A005C5658;
+			productRefGroup = 984CCA181EFA203A005C5658 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				984CCA161EFA203A005C5658 /* HWKit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		984CCA131EFA203A005C5658 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98DA7F031EFA497D00CE3540 /* HWPageView.m in Sources */,
+				98DA7EFF1EFA497D00CE3540 /* HWDrawerView.m in Sources */,
+				98DA7F001EFA497D00CE3540 /* HWDrawerViewCell.m in Sources */,
+				98DA7F021EFA497D00CE3540 /* HWHelper.m in Sources */,
+				98DA7F051EFA497D00CE3540 /* HWRichTextPraser.m in Sources */,
+				98DA7F0B1EFA497D00CE3540 /* PullToRefreshCustomTable.m in Sources */,
+				98DA7F011EFA497D00CE3540 /* HWGrowingTextView.m in Sources */,
+				98DA7EFE1EFA497D00CE3540 /* HWAlertController.m in Sources */,
+				98DA7F061EFA497D00CE3540 /* HWScrollTagView.m in Sources */,
+				98DA7F0C1EFA497D00CE3540 /* PullToRefreshView.m in Sources */,
+				98DA7F071EFA497D00CE3540 /* HWWeakTimer.m in Sources */,
+				98DA7F0A1EFA497D00CE3540 /* NetDisconnectView.m in Sources */,
+				98DA7F091EFA497D00CE3540 /* ATNetworkInfo.m in Sources */,
+				98DA7F041EFA497D00CE3540 /* HWRichText.m in Sources */,
+				98DA7F081EFA497D00CE3540 /* LoadMoreCell.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		984CCA1E1EFA203A005C5658 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		984CCA1F1EFA203A005C5658 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		984CCA211EFA203A005C5658 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		984CCA221EFA203A005C5658 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		984CCA121EFA203A005C5658 /* Build configuration list for PBXProject "HWKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				984CCA1E1EFA203A005C5658 /* Debug */,
+				984CCA1F1EFA203A005C5658 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		984CCA201EFA203A005C5658 /* Build configuration list for PBXNativeTarget "HWKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				984CCA211EFA203A005C5658 /* Debug */,
+				984CCA221EFA203A005C5658 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 984CCA0F1EFA203A005C5658 /* Project object */;
+}
