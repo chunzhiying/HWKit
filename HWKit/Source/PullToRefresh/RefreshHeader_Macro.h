@@ -37,11 +37,11 @@ do {\
         tipsLabel.font = [UIFont systemFontOfSize:13.0f];\
         tipsLabel.textColor = DefaultLightGrayColor;\
 \
-        refreshKLine = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_kLine"]];\
+        refreshKLine = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_kLine" inBundle:HWKitBundle compatibleWithTraitCollection:nil]];\
         refreshKLine.frame = CGRectMake(tipsLabel.frame.origin.x - 35, (RefreshHeaderHeight - 10)/2, 23, 10);\
-        refreshKLineRed = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_kLine_red"]];\
+        refreshKLineRed = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_kLine_red" inBundle:HWKitBundle compatibleWithTraitCollection:nil]];\
         refreshKLineRed.frame = refreshKLine.frame;\
-        refreshArrow = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_arrow"]];\
+        refreshArrow = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"refresh_arrow" inBundle:HWKitBundle compatibleWithTraitCollection:nil]];\
         refreshArrow.frame = CGRectMake(tipsLabel.frame.origin.x - 30, (RefreshHeaderHeight - 22)/2, 22, 22);\
 \
         UIBezierPath* path = [UIBezierPath bezierPath];\

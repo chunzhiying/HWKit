@@ -4,6 +4,10 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Assets.car</key>
+		<data>
+		AIMqPTozsFtOCMyRRSiGKm3SF20=
+		</data>
 		<key>HWDrawerViewCell.nib</key>
 		<data>
 		VIMNJE5MBA+lZTk/Xzaj/3cOnr4=
@@ -19,6 +23,17 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Assets.car</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			AIMqPTozsFtOCMyRRSiGKm3SF20=
+			</data>
+			<key>hash2</key>
+			<data>
+			sPDBo9WMJPvon1EyT8byX4VFEwQsNp3oWVfyUvoJJX4=
+			</data>
+		</dict>
 		<key>HWDrawerViewCell.nib</key>
 		<dict>
 			<key>hash</key>

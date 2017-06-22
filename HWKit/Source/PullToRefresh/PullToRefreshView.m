@@ -281,9 +281,8 @@ typedef NS_ENUM(NSInteger,  QueryState) {
 
 #pragma mark - Getter & Setter
 - (LoadMoreCell *)loadMoreCell {
-    if (!_loadMoreCell) {
-        NSBundle *bundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"HWKitBundle" ofType:@"bundle"]];
-        _loadMoreCell = [[bundle loadNibNamed:@"LoadMoreCell" owner:nil options:nil] lastObject];
+    if (!_loadMoreCell) {        
+        _loadMoreCell = [[HWKitBundle loadNibNamed:@"LoadMoreCell" owner:nil options:nil] lastObject];
         _loadMoreCell.delegate = self;
         _loadMoreCell.selectionStyle = UITableViewCellSelectionStyleNone;
         [_loadMoreCell setLoadMoreType:CanLoadMore];

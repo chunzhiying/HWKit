@@ -20,6 +20,13 @@
 
 @end
 
+// Bundle
+#define HWKitBundle \
+    [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"HWKitBundle" ofType:@"bundle"]]
+
+#define HWKitBundleAppendPath(path) \
+    [[HWKitBundle resourcePath] stringByAppendingPathComponent:path]
+
 // Log
 #define ATLogError(...)
 

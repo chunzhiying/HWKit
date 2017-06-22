@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		985428B01EFB7B6A0000092D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 985428AF1EFB79FF0000092D /* Images.xcassets */; };
 		98DA81E11EFA8A7900CE3540 /* HWAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA81B81EFA8A7900CE3540 /* HWAlertController.m */; };
 		98DA81E21EFA8A7900CE3540 /* HWDrawerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA81BB1EFA8A7900CE3540 /* HWDrawerView.m */; };
 		98DA81E31EFA8A7900CE3540 /* HWDrawerViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA81BD1EFA8A7900CE3540 /* HWDrawerViewCell.m */; };
@@ -51,6 +52,7 @@
 
 /* Begin PBXFileReference section */
 		984CCA171EFA203A005C5658 /* libHWKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHWKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		985428AF1EFB79FF0000092D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		98DA81A11EFA8A0400CE3540 /* HWKitBundle.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HWKitBundle.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		98DA81A31EFA8A0400CE3540 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98DA81B71EFA8A7900CE3540 /* HWAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWAlertController.h; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 		984CCA0E1EFA203A005C5658 = {
 			isa = PBXGroup;
 			children = (
+				985428AE1EFB79EE0000092D /* Resource */,
 				98DA81B51EFA8A7900CE3540 /* Source */,
 				98DA81A21EFA8A0400CE3540 /* HWKitBundle */,
 				984CCA181EFA203A005C5658 /* Products */,
@@ -123,6 +126,14 @@
 				98DA81A11EFA8A0400CE3540 /* HWKitBundle.bundle */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		985428AE1EFB79EE0000092D /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				985428AF1EFB79FF0000092D /* Images.xcassets */,
+			);
+			path = Resource;
 			sourceTree = "<group>";
 		};
 		98DA81A21EFA8A0400CE3540 /* HWKitBundle */ = {
@@ -327,6 +338,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				985428B01EFB7B6A0000092D /* Images.xcassets in Resources */,
 				98DA81F01EFA8A8A00CE3540 /* HWDrawerViewCell.xib in Resources */,
 				98DA81F11EFA8A8A00CE3540 /* LoadMoreCell.xib in Resources */,
 				98DA81F21EFA8A8A00CE3540 /* NetDisconnectView.xib in Resources */,
@@ -560,6 +572,7 @@
 				98DA81A51EFA8A0400CE3540 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
