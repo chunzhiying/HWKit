@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		985428A01EFB6EB70000092D /* HWKitBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9854289F1EFB6EB70000092D /* HWKitBundle.bundle */; };
 		98DA817F1EFA88EC00CE3540 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA817E1EFA88EC00CE3540 /* main.m */; };
 		98DA81821EFA88EC00CE3540 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA81811EFA88EC00CE3540 /* AppDelegate.m */; };
 		98DA81851EFA88EC00CE3540 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98DA81841EFA88EC00CE3540 /* ViewController.m */; };
@@ -14,7 +15,6 @@
 		98DA818A1EFA88EC00CE3540 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98DA81891EFA88EC00CE3540 /* Assets.xcassets */; };
 		98DA818D1EFA88EC00CE3540 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 98DA818B1EFA88EC00CE3540 /* LaunchScreen.storyboard */; };
 		98DA819C1EFA89A400CE3540 /* libHWKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98DA81991EFA898E00CE3540 /* libHWKit.a */; };
-		98DA81F41EFA8AC600CE3540 /* HWKitBundle.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 98DA81F31EFA8AC600CE3540 /* HWKitBundle.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9854289F1EFB6EB70000092D /* HWKitBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HWKitBundle.bundle; sourceTree = SOURCE_ROOT; };
 		98DA817A1EFA88EC00CE3540 /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98DA817E1EFA88EC00CE3540 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		98DA81801EFA88EC00CE3540 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -53,7 +54,6 @@
 		98DA818C1EFA88EC00CE3540 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		98DA818E1EFA88EC00CE3540 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98DA81941EFA898E00CE3540 /* HWKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = HWKit.xcodeproj; sourceTree = SOURCE_ROOT; };
-		98DA81F31EFA8AC600CE3540 /* HWKitBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = HWKitBundle.bundle; path = "../../../../../Library/Developer/Xcode/DerivedData/Demo-hidycpvlrgjoeaeitemhjmeswmjy/Build/Products/Debug-iphonesimulator/HWKitBundle.bundle"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,8 +87,8 @@
 		98DA817C1EFA88EC00CE3540 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				9854289F1EFB6EB70000092D /* HWKitBundle.bundle */,
 				98DA81941EFA898E00CE3540 /* HWKit.xcodeproj */,
-				98DA81F31EFA8AC600CE3540 /* HWKitBundle.bundle */,
 				98DA81801EFA88EC00CE3540 /* AppDelegate.h */,
 				98DA81811EFA88EC00CE3540 /* AppDelegate.m */,
 				98DA81831EFA88EC00CE3540 /* ViewController.h */,
@@ -204,7 +204,7 @@
 				98DA818D1EFA88EC00CE3540 /* LaunchScreen.storyboard in Resources */,
 				98DA818A1EFA88EC00CE3540 /* Assets.xcassets in Resources */,
 				98DA81881EFA88EC00CE3540 /* Main.storyboard in Resources */,
-				98DA81F41EFA8AC600CE3540 /* HWKitBundle.bundle in Resources */,
+				985428A01EFB6EB70000092D /* HWKitBundle.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
