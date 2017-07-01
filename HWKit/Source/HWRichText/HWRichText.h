@@ -36,6 +36,7 @@ typedef void(^TargetSelector)();
 - (HWRichText *)insertImage:(UIImage *)image withBounds:(CGRect)rect withSelector:(TargetSelector)selector;
 
 - (void)clearAllText;
+- (void)measureToResetFrame; //resetFrame by measure show line.
 
 @end
 

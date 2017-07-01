@@ -52,7 +52,7 @@ if(atBlock) {\
 
 @interface HWRichText() <UITextViewDelegate> {
     
-    bool _isFull;
+    CGRect _initFrame;
     NSUInteger _realLineCount;
     
     HWTextView *_contentTxtView;
@@ -99,6 +99,7 @@ if(atBlock) {\
 }
 
 - (void)initView {
+    _initFrame = self.frame;
     _contentAttributedStr = [NSMutableAttributedString new];
     
     _strSelectorDic = [NSMutableDictionary new];
@@ -126,7 +127,6 @@ if(atBlock) {\
     [_contentTxtView setFrame:self.bounds];
     
     [self shouldCenterContent];
-    [self measureShowLine];
 }
 
 - (void)shouldCenterContent {
@@ -152,13 +152,18 @@ if(atBlock) {\
     _contentTxtView.attributedText = _contentAttributedStr;
     _contentTxtView.bounces = YES;
     
+    self.frame = _initFrame;
+    
     [_strSelectorDic removeAllObjects];
     [_imgSelectorDic removeAllObjects];
     
-    _isFull = NO;
 }
 
 #pragma mark - Figrue MaxShowLine
+- (void)measureToResetFrame {
+    [self measureShowLine];
+}
+
 - (void)setMaxShowLine:(NSUInteger)maxShowLine {
     _maxShowLine = maxShowLine;
     [self measureShowLine];
@@ -222,10 +227,6 @@ if(atBlock) {\
 
 - (HWRichText *)insertString:(NSString *)string withFont:(UIFont *)font withTextColor:(UIColor *)color withSelector:(TargetSelector)selector {
     
-    if (_isFull) {
-        return self;
-    }
-    
     NSUInteger location = _contentAttributedStr.length;
     
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
@@ -257,7 +258,6 @@ if(atBlock) {\
     
     _contentTxtView.attributedText = _contentAttributedStr;
     
-    [self measureShowLine];
     [self setNeedsLayout];
     
     return self;
@@ -270,7 +270,7 @@ if(atBlock) {\
 
 - (HWRichText *)insertImage:(UIImage *)image withBounds:(CGRect)rect withSelector:(TargetSelector)selector {
     
-    if (image == nil || _isFull) {
+    if (image == nil) {
         return self;
     }
     
@@ -397,8 +397,6 @@ if(atBlock) {\
     
     if (removeCount > 0) {
         
-        _isFull = YES;
-        
         NSMutableAttributedString *showAttributeStr = [_contentAttributedStr mutableCopy];
         
         NSRange ellipsisRange = NSMakeRange(showAttributeStr.length - (removeCount + EllipsisLength), EllipsisLength);
@@ -415,13 +413,16 @@ if(atBlock) {\
         
     }
     
+    _contentTxtView.bounces = NO;
+    
     NSUInteger realLineCount = removeCount > 0 ? _maxShowLine : _realLineCount;
     
     CGFloat height = realLineCount * _font.lineHeight + (realLineCount - 1) * _lineSpace + _contentTxtView.textContainerInset.bottom + _contentTxtView.textContainerInset.top;
     
-    _contentTxtView.bounces = NO;
+    CGFloat width = (removeCount == 0 && _maxShowLine == 1) ? (FigureStrWidth(showString) + imgTotalWidth + 2 * _contentTxtView.textContainer.lineFragmentPadding) : self.frame.size.width;
     
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, height);
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, ceilf(width), ceilf(height));
+    [self setNeedsLayout];
 }
 
 
