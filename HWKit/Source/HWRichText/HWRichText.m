@@ -529,6 +529,9 @@ if(atBlock) {\
     NSUInteger realLineCount;
     while ((realLineCount = FigureStrHeight(shouldCutStr) / _font.lineHeight) > _maxShowLine) {
         NSInteger minuend = realLineCount - _maxShowLine > 1 ? MinWordCountPerLine : EllipsisLength;
+        if (shouldCutStr.length <= minuend) {
+            break;
+        }
         shouldCutStr = [shouldCutStr substringToIndex:shouldCutStr.length - minuend];
         shouldCutCount += minuend;
     }
