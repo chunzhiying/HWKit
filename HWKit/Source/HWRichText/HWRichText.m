@@ -15,7 +15,7 @@
 #define MinWordCountPerLine floorf(self.bounds.size.width / _font.pointSize)
 
 #define FigureStrHeight(str) \
-[str boundingRectWithSize:CGSizeMake(self.bounds.size.width - 2 * _contentTxtView.textContainer.lineFragmentPadding, MAXFLOAT) \
+[str boundingRectWithSize:CGSizeMake(self.bounds.size.width - (_maxShowLine == 1 ? 0 : 2 * _contentTxtView.textContainer.lineFragmentPadding), MAXFLOAT) \
     options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin \
     attributes:@{NSFontAttributeName : _font} \
     context:nil].size.height
@@ -391,7 +391,7 @@ if(atBlock) {\
                                ImgTotalWidthKey : @(imgTotalWidth),
                                ImgLocationAryKey : imgLocationAry};
     
-    removeCount = imgTotalWidth > FigureStrWidth(showString)
+    removeCount = ceilf(imgTotalWidth / [_font pointSize]) > showString.length
     ? [self figureMoreImgWithDic:origData]
     : [self figureMoreTextWithDic:origData];
     
@@ -435,7 +435,6 @@ if(atBlock) {\
     NSInteger imgTotalWidth = [data[ImgTotalWidthKey] integerValue];
     NSArray *imgLocationAry = data[ImgLocationAryKey];
     
-    
     if (imgTotalWidth > 0) {
         
         CGFloat strWidth;
@@ -451,10 +450,8 @@ if(atBlock) {\
             removeCount += wordCount;
             
         } else {
-            
             NSString *newString = [NSString stringWithFormat:@"%@%@", showString, [showString substringFromIndex:showString.length - wordCount]];
             removeCount += [self cutStringForMaxShowLine:newString];
-            
         }
         
         // 可能有图片在截断处之后，补回这些图片占的空间
@@ -502,7 +499,7 @@ if(atBlock) {\
     [imgLocationAry sortUsingComparator:^NSComparisonResult(id obj1, id obj2)
      {return [obj1[@"loc"] integerValue] > [obj2[@"loc"] integerValue] ? NSOrderedDescending : NSOrderedAscending;}];
     
-    CGFloat holderOutWidth = FigureStrWidth(@"(&&)");
+    CGFloat holderOutWidth = FigureStrWidth(@"()");
     CGFloat holderInPerWidth = FigureStrWidth(@"A");
     
     NSUInteger imgHolderTotalCount = 0;
@@ -527,7 +524,15 @@ if(atBlock) {\
 - (NSUInteger)cutStringForMaxShowLine:(NSString *)shouldCutStr {
     NSUInteger shouldCutCount = 0;
     NSUInteger realLineCount;
+
     while ((realLineCount = FigureStrHeight(shouldCutStr) / _font.lineHeight) > _maxShowLine) {
+        
+        CGSize size = [shouldCutStr boundingRectWithSize:CGSizeMake(self.bounds.size.width - 2 * _contentTxtView.textContainer.lineFragmentPadding, MAXFLOAT) \
+                                                 options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin \
+                                              attributes:@{NSFontAttributeName : _font} \
+                                                 context:nil].size;
+
+        
         NSInteger minuend = realLineCount - _maxShowLine > 1 ? MinWordCountPerLine : EllipsisLength;
         if (shouldCutStr.length <= minuend) {
             break;
@@ -540,38 +545,37 @@ if(atBlock) {\
 }
 
 - (NSString *)buildImgHolderWithCount:(NSInteger)count {
-    NSMutableString *result = [[NSMutableString alloc] initWithString:@"(&"];
+    NSMutableString *result = [[NSMutableString alloc] initWithString:@"("];
     for (NSInteger i = 0; i < count; i++) {
         [result appendString:@"A"];
     }
-    [result appendString:@"&)"];
+    [result appendString:@")"];
     return result;
 }
 
 - (NSUInteger)parseImgHolderStr:(NSString *)str {
     
     NSError *error = nil;
-    NSString *imgHolderStr = [NSString stringWithFormat:@"(&%@", str];
+    NSString *imgHolderStr = [NSString stringWithFormat:@"(%@", str];
     NSUInteger withoutImgHolderLength = imgHolderStr.length;
     
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@".(&A*&)."
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\(A*\\)"
                                                                            options:NSRegularExpressionDotMatchesLineSeparators
                                                                              error:&error];
     NSArray<NSTextCheckingResult *> *result = [regex matchesInString:imgHolderStr options:0 range:NSMakeRange(0, imgHolderStr.length)];
     if (result) {
         for (NSTextCheckingResult *res in result) {
             NSString *imgHolder = [imgHolderStr substringWithRange:res.range];
-            NSLog(@"imgHolder:%@", imgHolder);
             
             withoutImgHolderLength -= imgHolder.length;
             if (res.range.location == 0) {
-                withoutImgHolderLength += @"(&".length;
+                withoutImgHolderLength += @"(".length;
             }
         }
     }
     withoutImgHolderLength += result.count;
     
-    return withoutImgHolderLength - @"(&".length;
+    return withoutImgHolderLength - @"(".length;
 }
 
 @end
